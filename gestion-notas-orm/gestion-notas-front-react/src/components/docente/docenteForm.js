@@ -57,59 +57,63 @@ const DocenteForm = ({ initialData, onSave, onCancel }) => {
     }
   };
 
+  const handleReset = () => {
+    if (initialData) {
+      setFormData({
+        nombre: initialData.nombre || '',
+        departamento: initialData.departamento || ''
+      });
+    } else {
+      setFormData({ nombre: '', departamento: '' });
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit}>
-      <div className="space-y-4">
-        {/* campo nombre */}
+      <div align="center">
+        <h3 align="center">Formulario de ingreso de docentes</h3>
+        <table align="center" cellPadding="6">
+          <tbody>
+            <tr>
+              <td><label>Nombre completo *</label></td>
+              <td>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  placeholder="Ej: Dr. Carlos Méndez"
+                  required
+                  size="50"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td><label>Departamento *</label></td>
+              <td>
+                <input
+                  type="text"
+                  name="departamento"
+                  value={formData.departamento}
+                  onChange={handleChange}
+                  placeholder="Ej: Ciencias de la Computación"
+                  required
+                  size="50"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre completo *
-          </label>
-          <input
-            type="text"
-            name="nombre"
-            value={formData.nombre}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ej: Dr. Carlos Méndez"
-            required
-          />
+          <button type="button" onClick={handleReset} disabled={saving}>Cancelar</button>
+          &nbsp;
+          <button type="submit" disabled={saving}>{saving ? 'Guardando...' : (initialData ? 'Actualizar' : 'Crear')}</button>
         </div>
 
-        {/* campo departamento */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Departamento *
-          </label>
-          <input
-            type="text"
-            name="departamento"
-            value={formData.departamento}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ej: Ciencias de la Computación"
-            required
-          />
+          <button type="button" onClick={onCancel}>Cerrar</button>
         </div>
-      </div>
-
-      {/* botones de acción */}
-      <div className="flex justify-end gap-3 mt-6">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-          disabled={saving}
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-          disabled={saving}
-        >
-          {saving ? 'Guardando...' : (initialData ? 'Actualizar' : 'Crear')}
-        </button>
       </div>
     </form>
   );

@@ -33,6 +33,20 @@ const NotaForm = ({ initialData, onSave, onCancel }) => {
     }
   }, [initialData]);
 
+  const handleReset = () => {
+    if (initialData) {
+      setFormData({
+        estudianteId: initialData.estudianteId || '',
+        asignaturaId: initialData.asignaturaId || '',
+        nota1: initialData.nota1 || '',
+        nota2: initialData.nota2 || '',
+        nota3: initialData.nota3 || ''
+      });
+    } else {
+      setFormData({ estudianteId: '', asignaturaId: '', nota1: '', nota2: '', nota3: '' });
+    }
+  };
+
   // cargar lista de estudiantes
   const cargarEstudiantes = async () => {
     try {
@@ -111,132 +125,66 @@ const NotaForm = ({ initialData, onSave, onCancel }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="space-y-4">
-        {/* selector de estudiante */}
+      <div align="center">
+        <h3 align="center">Formulario de ingreso de notas</h3>
+        <table align="center" cellPadding="6">
+          <tbody>
+            <tr>
+              <td><label>Estudiante: </label></td>
+              <td>
+                <select name="estudianteId" value={formData.estudianteId} onChange={handleChange} required>
+                  <option value="">Seleccione un estudiante</option>
+                  {estudiantes.map(est => (
+                    <option key={est.id} value={est.id}>{est.nombre} - {est.carrera}</option>
+                  ))}
+                </select>
+              </td>
+            </tr>
+
+            <tr>
+              <td><label>Asignatura: </label></td>
+              <td>
+                <select name="asignaturaId" value={formData.asignaturaId} onChange={handleChange} required>
+                  <option value="">Seleccione una asignatura</option>
+                  {asignaturas.map(asig => (
+                    <option key={asig.id} value={asig.id}>{asig.codigo} - {asig.nombre}</option>
+                  ))}
+                </select>
+              </td>
+            </tr>
+
+            <tr>
+              <td><label>Nota 1: </label></td>
+              <td>
+                <input type="number" name="nota1" value={formData.nota1} onChange={handleChange} placeholder="0-20" min="0" max="20" step="0.1" required size="6" />
+              </td>
+            </tr>
+
+            <tr>
+              <td><label>Nota 2: </label></td>
+              <td>
+                <input type="number" name="nota2" value={formData.nota2} onChange={handleChange} placeholder="0-20" min="0" max="20" step="0.1" required size="6" />
+              </td>
+            </tr>
+
+            <tr>
+              <td><label>Nota 3: </label></td>
+              <td>
+                <input type="number" name="nota3" value={formData.nota3} onChange={handleChange} placeholder="0-20" min="0" max="20" step="0.1" required size="6" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Estudiante *
-          </label>
-          <select
-            name="estudianteId"
-            value={formData.estudianteId}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="">Seleccione un estudiante</option>
-            {estudiantes.map(est => (
-              <option key={est.id} value={est.id}>
-                {est.nombre} - {est.carrera}
-              </option>
-            ))}
-          </select>
+          <button type="button" onClick={handleReset} disabled={saving}>Cancelar</button>
+          &nbsp;
+          <button type="submit" disabled={saving}>{saving ? 'Guardando...' : (initialData ? 'Actualizar' : 'Crear')}</button>
         </div>
 
-        {/* selector de asignatura */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Asignatura *
-          </label>
-          <select
-            name="asignaturaId"
-            value={formData.asignaturaId}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="">Seleccione una asignatura</option>
-            {asignaturas.map(asig => (
-              <option key={asig.id} value={asig.id}>
-                {asig.codigo} - {asig.nombre}
-              </option>
-            ))}
-          </select>
+          <button type="button" onClick={onCancel}>Cerrar</button>
         </div>
-
-        {/* campos de notas */}
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nota 1 *
-            </label>
-            <input
-              type="number"
-              name="nota1"
-              value={formData.nota1}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="0-20"
-              min="0"
-              max="20"
-              step="0.1"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nota 2 *
-            </label>
-            <input
-              type="number"
-              name="nota2"
-              value={formData.nota2}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="0-20"
-              min="0"
-              max="20"
-              step="0.1"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nota 3 *
-            </label>
-            <input
-              type="number"
-              name="nota3"
-              value={formData.nota3}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="0-20"
-              min="0"
-              max="20"
-              step="0.1"
-              required
-            />
-          </div>
-        </div>
-
-        {/* información adicional */}
-        <div className="bg-blue-50 p-3 rounded-md">
-          <p className="text-sm text-blue-700">
-            <strong>Nota:</strong> El promedio y la categoría se calcularán automáticamente en el backend.
-            Categoría: Aprobado si promedio ≥ 14, Reprobado si promedio &lt; 14.
-          </p>
-        </div>
-      </div>
-
-      {/* botones de acción */}
-      <div className="flex justify-end gap-3 mt-6">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-          disabled={saving}
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-          disabled={saving}
-        >
-          {saving ? 'Guardando...' : (initialData ? 'Actualizar' : 'Crear')}
-        </button>
       </div>
     </form>
   );

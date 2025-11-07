@@ -53,66 +53,46 @@ const NotaList = ({ onEdit, onDelete }) => {
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">Cargando notas...</p>
+      <div align="center">
+        <p>Cargando notas...</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-gray-100">
+    <div>
+      <table border="1" cellPadding="8" width="90%" align="center">
+        <thead>
           <tr>
-            <th className="px-4 py-3 text-left text-gray-700">Estudiante</th>
-            <th className="px-4 py-3 text-left text-gray-700">Asignatura</th>
-            <th className="px-4 py-3 text-center text-gray-700">Nota 1</th>
-            <th className="px-4 py-3 text-center text-gray-700">Nota 2</th>
-            <th className="px-4 py-3 text-center text-gray-700">Nota 3</th>
-            <th className="px-4 py-3 text-center text-gray-700">Promedio</th>
-            <th className="px-4 py-3 text-center text-gray-700">Categoría</th>
-            <th className="px-4 py-3 text-center text-gray-700">Acciones</th>
+            <th>Estudiante</th>
+            <th>Asignatura</th>
+            <th>Nota 1</th>
+            <th>Nota 2</th>
+            <th>Nota 3</th>
+            <th>Promedio</th>
+            <th>Categoría</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {notas.length === 0 ? (
             <tr>
-              <td colSpan="8" className="text-center py-8 text-gray-500">
-                No hay notas registradas
-              </td>
+              <td colSpan="8" align="center">No hay notas registradas</td>
             </tr>
           ) : (
             notas.map((nota) => (
-              <tr key={nota.id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3">{getEstudianteNombre(nota)}</td>
-                <td className="px-4 py-3">{getAsignaturaNombre(nota)}</td>
-                <td className="px-4 py-3 text-center">{nota.nota1?.toFixed(1)}</td>
-                <td className="px-4 py-3 text-center">{nota.nota2?.toFixed(1)}</td>
-                <td className="px-4 py-3 text-center">{nota.nota3?.toFixed(1)}</td>
-                <td className="px-4 py-3 text-center font-bold">{nota.promedio?.toFixed(2)}</td>
-                <td className="px-4 py-3 text-center">
-                  <span className={`px-3 py-1 rounded-full text-sm ${
-                    nota.promedio >= 14 ? 'bg-green-100 text-green-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {nota.categoria}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <button
-                    onClick={() => onEdit(nota)}
-                    className="text-blue-600 hover:text-blue-800 mx-2"
-                    title="Editar"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    onClick={() => handleDelete(nota.id)}
-                    className="text-red-600 hover:text-red-800 mx-2"
-                    title="Eliminar"
-                  >
-                    🗑️
-                  </button>
+              <tr key={nota.id}>
+                <td>{getEstudianteNombre(nota)}</td>
+                <td>{getAsignaturaNombre(nota)}</td>
+                <td align="center">{nota.nota1?.toFixed(1)}</td>
+                <td align="center">{nota.nota2?.toFixed(1)}</td>
+                <td align="center">{nota.nota3?.toFixed(1)}</td>
+                <td align="center">{nota.promedio?.toFixed(2)}</td>
+                <td align="center">{nota.categoria}</td>
+                <td align="center">
+                  <button onClick={() => onEdit(nota)} title="Editar">Editar</button>
+                  &nbsp;
+                  <button onClick={() => handleDelete(nota.id)} title="Eliminar">Eliminar</button>
                 </td>
               </tr>
             ))

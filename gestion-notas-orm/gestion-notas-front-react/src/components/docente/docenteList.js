@@ -43,51 +43,38 @@ const DocenteList = ({ onEdit, onDelete }) => {
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">Cargando docentes...</p>
+      <div align="center">
+        <p>Cargando docentes...</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-gray-100">
+    <div>
+      <table border="1" cellPadding="8" width="80%" align="center">
+        <thead>
           <tr>
-            <th className="px-4 py-3 text-left text-gray-700">ID</th>
-            <th className="px-4 py-3 text-left text-gray-700">Nombre</th>
-            <th className="px-4 py-3 text-left text-gray-700">Departamento</th>
-            <th className="px-4 py-3 text-center text-gray-700">Acciones</th>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Departamento</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {docentes.length === 0 ? (
             <tr>
-              <td colSpan="4" className="text-center py-8 text-gray-500">
-                No hay docentes registrados
-              </td>
+              <td colSpan="4" align="center">No hay docentes registrados</td>
             </tr>
           ) : (
             docentes.map((doc) => (
-              <tr key={doc.id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3">{doc.id}</td>
-                <td className="px-4 py-3 font-medium">{doc.nombre}</td>
-                <td className="px-4 py-3">{doc.departamento}</td>
-                <td className="px-4 py-3 text-center">
-                  <button
-                    onClick={() => onEdit(doc)}
-                    className="text-blue-600 hover:text-blue-800 mx-2"
-                    title="Editar"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    onClick={() => handleDelete(doc.id)}
-                    className="text-red-600 hover:text-red-800 mx-2"
-                    title="Eliminar"
-                  >
-                    🗑️
-                  </button>
+              <tr key={doc.id}>
+                <td>{doc.id}</td>
+                <td>{doc.nombre}</td>
+                <td>{doc.departamento}</td>
+                <td align="center">
+                  <button onClick={() => onEdit(doc)} title="Editar">Editar</button>
+                  &nbsp;
+                  <button onClick={() => handleDelete(doc.id)} title="Eliminar">Eliminar</button>
                 </td>
               </tr>
             ))

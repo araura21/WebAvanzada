@@ -81,97 +81,91 @@ const AsignaturaForm = ({ initialData, onSave, onCancel }) => {
       setSaving(false);
     }
   };
+  const handleReset = () => {
+    if (initialData) {
+      setFormData({
+        nombre: initialData.nombre || '',
+        codigo: initialData.codigo || '',
+        creditos: initialData.creditos || '',
+        docenteId: initialData.docenteId || ''
+      });
+    } else {
+      setFormData({ nombre: '', codigo: '', creditos: '', docenteId: '' });
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="space-y-4">
-        {/* campo nombre */}
+      <div align="center">
+        <h3 align="center">Formulario de asignaturas</h3>
+        <table align="center" cellPadding="6">
+          <tbody>
+            <tr>
+              <td><label>Nombre de la asignatura: </label></td>
+              <td>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  placeholder="Ej: POO"
+                  required
+                  size="50"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td><label>Código: </label></td>
+              <td>
+                <input
+                  type="text"
+                  name="codigo"
+                  value={formData.codigo}
+                  onChange={handleChange}
+                  placeholder="Ej: POO101"
+                  required
+                  size="20"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td><label>Créditos: </label></td>
+              <td>
+                <input
+                  type="number"
+                  name="creditos"
+                  value={formData.creditos}
+                  onChange={handleChange}
+                  placeholder="Ej: 4"
+                  min="1"
+                  required
+                  size="5"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td><label>Docente: </label></td>
+              <td>
+                <select name="docenteId" value={formData.docenteId} onChange={handleChange}>
+                  <option value="">Sin asignar</option>
+                  {docentes.map(doc => (
+                    <option key={doc.id} value={doc.id}>{doc.nombre} - {doc.departamento}</option>
+                  ))}
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre de la asignatura *
-          </label>
-          <input
-            type="text"
-            name="nombre"
-            value={formData.nombre}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ej: Programación Orientada a Objetos"
-            required
-          />
+          <button type="button" onClick={handleReset} disabled={saving}>Cancelar</button>
+          &nbsp;
+          <button type="submit" disabled={saving}>{saving ? 'Guardando...' : (initialData ? 'Actualizar' : 'Crear')}</button>
         </div>
 
-        {/* campo código */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Código *
-          </label>
-          <input
-            type="text"
-            name="codigo"
-            value={formData.codigo}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ej: POO101"
-            required
-          />
+          <button type="button" onClick={onCancel}>Cerrar</button>
         </div>
-
-        {/* campo créditos */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Créditos *
-          </label>
-          <input
-            type="number"
-            name="creditos"
-            value={formData.creditos}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ej: 4"
-            min="1"
-            required
-          />
-        </div>
-
-        {/* campo docente */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Docente (opcional)
-          </label>
-          <select
-            name="docenteId"
-            value={formData.docenteId}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Sin asignar</option>
-            {docentes.map(doc => (
-              <option key={doc.id} value={doc.id}>
-                {doc.nombre} - {doc.departamento}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* botones de acción */}
-      <div className="flex justify-end gap-3 mt-6">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-          disabled={saving}
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-          disabled={saving}
-        >
-          {saving ? 'Guardando...' : (initialData ? 'Actualizar' : 'Crear')}
-        </button>
       </div>
     </form>
   );

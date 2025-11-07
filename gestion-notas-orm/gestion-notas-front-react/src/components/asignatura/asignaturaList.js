@@ -41,63 +41,39 @@ const AsignaturaList = ({ onEdit, onDelete }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">Cargando asignaturas...</p>
-      </div>
-    );
-  }
+  if (loading) return <div><p align="center">Cargando asignaturas...</p></div>;
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="px-4 py-3 text-left text-gray-700">Código</th>
-            <th className="px-4 py-3 text-left text-gray-700">Nombre</th>
-            <th className="px-4 py-3 text-left text-gray-700">Créditos</th>
-            <th className="px-4 py-3 text-left text-gray-700">Docente</th>
-            <th className="px-4 py-3 text-center text-gray-700">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {asignaturas.length === 0 ? (
+    <div>
+      {asignaturas.length === 0 ? (
+        <p align="center">No hay asignaturas registradas</p>
+      ) : (
+        <table border="1" cellPadding="8" width="90%" align="center">
+          <thead>
             <tr>
-              <td colSpan="5" className="text-center py-8 text-gray-500">
-                No hay asignaturas registradas
-              </td>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Créditos</th>
+              <th>Docente</th>
+              <th>Acciones</th>
             </tr>
-          ) : (
-            asignaturas.map((asig) => (
-              <tr key={asig.id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3 font-mono">{asig.codigo}</td>
-                <td className="px-4 py-3 font-medium">{asig.nombre}</td>
-                <td className="px-4 py-3">{asig.creditos}</td>
-                <td className="px-4 py-3">
-                  {asig.Docente ? asig.Docente.nombre : (asig.docenteId || 'Sin asignar')}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <button
-                    onClick={() => onEdit(asig)}
-                    className="text-blue-600 hover:text-blue-800 mx-2"
-                    title="Editar"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    onClick={() => handleDelete(asig.id)}
-                    className="text-red-600 hover:text-red-800 mx-2"
-                    title="Eliminar"
-                  >
-                    🗑️
-                  </button>
+          </thead>
+          <tbody>
+            {asignaturas.map(asig => (
+              <tr key={asig.id}>
+                <td>{asig.codigo}</td>
+                <td>{asig.nombre}</td>
+                <td>{asig.creditos}</td>
+                <td>{asig.Docente ? asig.Docente.nombre : (asig.docenteId || 'Sin asignar')}</td>
+                <td>
+                  <button onClick={() => onEdit(asig)} title="Editar">Editar</button>
+                  <button onClick={() => handleDelete(asig.id)} title="Eliminar">Eliminar</button>
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
