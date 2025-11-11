@@ -1,191 +1,159 @@
-import { Arbol } from "../models/arbol.js";
+import {Arboles} from "../models/arbol.js";
 
-// Tabla de referencia con precios y rebajas según el ejercicio
-const CATALOGO_ARBOLES = {
-    "Paltos": {
-        precioUnitario: 1200,
-        rebaja100a300: 10,
-        rebajaMayor300: 18
-    },
-    "Limones": {
-        precioUnitario: 1000,
-        rebaja100a300: 12.5,
-        rebajaMayor300: 20
-    },
-    "Chirimoyos": {
-        precioUnitario: 980,
-        rebaja100a300: 14.5,
-        rebajaMayor300: 19
-    }
+const ARBOLES = {
+  paltos: { precio: 1200, rebaja100a300: 0.10, rebajaMas300: 0.18,},
+  limones: {precio: 1000, rebaja100a300: 0.125,rebajaMas300: 0.20,},
+  chirimoyos: {precio: 980,rebaja100a300: 0.145,rebajaMas300: 0.19,},
 };
 
-/**
- * Calcular precio con descuentos e IVA según el ejercicio
- * 
- * Responsabilidades del controlador:
- * ✓ Recibir los datos ingresados por el usuario (tipo de árbol y cantidad)
- * ✓ Verificar en qué rango cae la cantidad (≤100, 100–300, >300, >1000)
- * ✓ Aplicar el porcentaje de rebaja según las condiciones
- * ✓ Calcular el subtotal, rebaja total, IVA y valor final
- * ✓ Validar que los valores ingresados sean correctos (no negativos, no vacíos)
- */
-export const calcularPrecioArbol = async (req, res) => {
-    try {
-        const { tipoArbol, cantidad } = req.body;
+//ajustable
+const IVA = 0.15;
 
-        // ✓ Validar que los valores ingresados no sean vacíos
-        if (!tipoArbol || cantidad === undefined || cantidad === null) {
-            return res.status(400).json({ 
-                mensaje: "Faltan datos requeridos: tipoArbol y cantidad" 
-            });
-        }
 
-        // ✓ Validar que la cantidad sea un número válido y no negativo
-        if (isNaN(cantidad) || cantidad <= 0) {
-            return res.status(400).json({ 
-                mensaje: "La cantidad debe ser un número mayor a 0" 
-            });
-        }
+export const calcularRebajas = (tipoArbol, cantidad) => {
 
-        // Verificar que el tipo de árbol exista en el catálogo
-        if (!CATALOGO_ARBOLES[tipoArbol]) {
-            return res.status(404).json({ 
-                mensaje: `Tipo de árbol '${tipoArbol}' no encontrado. Disponibles: ${Object.keys(CATALOGO_ARBOLES).join(', ')}` 
-            });
-        }
+  const {precio, rebaja100a300, rebajaMas300 } = ARBOLES[tipoArbol];
 
-        const cantidad_num = parseInt(cantidad);
-        const arbolRef = CATALOGO_ARBOLES[tipoArbol];
-        const precioUnitario = arbolRef.precioUnitario;
+  // Determinar rebaja base por rango
+  let rebajaBase = 0;
+  let rebajaAdicional = 0;
+  if (cantidad > 100 && cantidad <= 300) {
+    rebajaBase = rebaja100a300;
+  } else if (cantidad > 300) {
+    rebajaBase = rebajaMas300;
+  } else if (cantidad > 100){
+    rebajaAdicional = 0.15;
+  }
 
-        // ✓ Calcular el subtotal sin descuentos
-        const subtotal = precioUnitario * cantidad_num;
+  const rebajaTotal = rebajaBase + rebajaAdicional; 
 
-        // ✓ Verificar en qué rango cae la cantidad (≤100, 100–300, >300, >1000)
-        let porcentajeRebaja = 0;
-        let rangoDescripcion = "";
-        
-        if (cantidad_num <= 100) {
-            porcentajeRebaja = 0; // Sin rebaja
-            rangoDescripcion = "≤ 100 árboles (sin rebaja)";
-        } else if (cantidad_num > 100 && cantidad_num <= 300) {
-            porcentajeRebaja = arbolRef.rebaja100a300;
-            rangoDescripcion = "100-300 árboles";
-        } else if (cantidad_num > 300) {
-            porcentajeRebaja = arbolRef.rebajaMayor300;
-            rangoDescripcion = "> 300 árboles";
-        }
+  const subtotal = precio * cantidad;
+  const descuentoValor = subtotal * rebajaTotal;
+  const subtotalConDescuento = subtotal - descuentoValor;
+  const iva = subtotalConDescuento * IVA;
+  const totalPagar = subtotalConDescuento + iva;
 
-        // ✓ Aplicar el porcentaje de rebaja según las condiciones
-        const montoRebaja = subtotal * (porcentajeRebaja / 100);
-        let subtotalConRebaja = subtotal - montoRebaja;
-
-        // ✓ Aplicar descuento adicional del 15% si cantidad > 1000
-        let descuentoAdicional = 0;
-        if (cantidad_num > 1000) {
-            descuentoAdicional = subtotalConRebaja * 0.15;
-            subtotalConRebaja = subtotalConRebaja - descuentoAdicional;
-        }
-
-        // ✓ Calcular IVA del 15% sobre subtotal con rebaja(s)
-        const IVA_RATE = 0.15;
-        const montoIVA = subtotalConRebaja * IVA_RATE;
-        
-        // ✓ Calcular valor final (totalPagar)
-        const totalPagar = subtotalConRebaja + montoIVA;
-
-        // Guardar la compra en la BD con los atributos del modelo
-        const compra = await Arbol.create({
-            tipoArbol,
-            precioUnitario,
-            cantidad: cantidad_num,
-            rebaja: parseFloat(montoRebaja.toFixed(2)),
-            iva: parseFloat(montoIVA.toFixed(2)),
-            totalPagar: parseFloat(totalPagar.toFixed(2))
-        });
-
-        // Respuesta con detalles del cálculo
-        const respuesta = {
-            id: compra.id,
-            tipoArbol,
-            cantidad: cantidad_num,
-            rango: rangoDescripcion,
-            precioUnitario: precioUnitario.toFixed(2),
-            subtotal: subtotal.toFixed(2),
-            porcentajeRebaja: porcentajeRebaja.toFixed(2) + '%',
-            montoRebaja: montoRebaja.toFixed(2),
-            descuentoAdicional15: descuentoAdicional > 0 ? descuentoAdicional.toFixed(2) : "0.00",
-            subtotalConDescuento: subtotalConRebaja.toFixed(2),
-            porcentajeIVA: "15.00%",
-            montoIVA: montoIVA.toFixed(2),
-            totalPagar: totalPagar.toFixed(2)
-        };
-
-        res.status(201).json(respuesta);
-
-    } catch (error) {
-        res.status(500).json({ 
-            mensaje: "Error al calcular el precio", 
-            error: error.message 
-        });
-    }
+  return {
+    precio,
+    rebajaTotal,
+    subtotal: Number(subtotal.toFixed(2)),
+    descuentoValor: Number(descuentoValor.toFixed(2)),
+    subtotalConDescuento: Number(subtotalConDescuento.toFixed(2)),
+    iva: Number(iva.toFixed(2)),
+    totalPagar: Number(totalPagar.toFixed(2)),
+  };
 };
 
-/**
- * Listar todas las compras realizadas
- */
-export const listarArboles = async (req, res) => {
-    try {
-        const compras = await Arbol.findAll();
-        res.json(compras);
-    } catch (error) {
-        res.status(500).json({ 
-            mensaje: "Error al listar compras", 
-            error: error.message 
-        });
+// Body: { tipoArbol: "paltos"|"limones"|"chirimoyos", cantidad: number }, funcion crear compra
+export const calcularCompraArboles = async (req, res) => {
+  try {
+    const tipoArbol = req.body.tipoArbol;
+    const cantidad = Number(req.body.cantidad);
+
+    // Validaciones básicas
+    if (!tipoArbol || !(tipoArbol in ARBOLES)) {
+      return res.status(400).json({ mensaje: "Tipo de arbol inexistente" });
     }
+    if (Number.isNaN(cantidad) || cantidad <= 0) {
+      return res.status(400).json({ mensaje: "Cantidad debe ser un número mayor a 0." });
+    }
+
+    const { precio, rebajaTotal, subtotal, descuentoValor, iva, totalPagar } = calcularRebajas(tipoArbol, cantidad);
+
+    // Crear compra
+    const nuevo = await ArbolCompra.create({
+      tipoArbol,
+      precioUnitario: precio,
+      cantidad,
+      rebaja: rebajaTotal,
+      iva,
+      totalPagar,
+      subtotal,
+      descuentoValor,
+    });
+    return res.status(201).json(nuevo);
+
+  } catch (error) {
+    return res.status(500).json({ mensaje: "Error al calcular la compra de arboles", error: error.message });
+  }
 };
 
-/**
- * Buscar compra por ID
- */
-export const buscarArbolId = async (req, res) => {
-    try {
-        const compra = await Arbol.findByPk(req.params.id);
-        if (!compra) {
-            return res.status(404).json({ 
-                mensaje: "Compra no encontrada" 
-            });
-        }
-        res.json(compra);
-    } catch (error) {
-        res.status(500).json({ 
-            mensaje: "Error al buscar compra", 
-            error: error.message 
-        });
-    }
+//Obtener todas las compras de arboles
+export const listarComprasArboles = async (_req, res) => {
+  try {
+    const compras = await Arboles.findAll();
+    res.json(compras);
+
+  } catch (error) {
+    return res.status(500).json({ mensaje: "Error al listar compras de árboles", error: error.message });
+  }
 };
 
-/**
- * Eliminar compra por ID
- */
-export const eliminarArbol = async (req, res) => {
-    try {
-        const compra = await Arbol.findByPk(req.params.id);
-        if (!compra) {
-            return res.status(404).json({ 
-                mensaje: "Compra no encontrada para eliminar" 
-            });
-        }
-        await compra.destroy();
-        res.json({ 
-            mensaje: "Compra eliminada correctamente" 
-        });
-    } catch (error) {
-        res.status(500).json({ 
-            mensaje: "Error al eliminar compra", 
-            error: error.message 
-        });
+//Obtener compra por id
+export const obtenerCompraArbolPorId = async (req, res) => {
+  try {
+    const compra = await Arboles.findByPk(req.params.id);
+    if (!compra){
+      return res.status(404).json({ mensaje: "Compra no encontrada" });
     }
+    res.json(compra);
+
+  } catch (error) {
+    return res.status(500).json({ mensaje: "Error al obtener la compra", error: error.message });
+  }
 };
 
+// Eliminar arbol por id
+export const eliminarCompraArbol = async (req, res) => {
+  try {
+    const compra = await Arboles.findByPk(req.params.id);
+    if (!compra) 
+      return res.status(404).json({ mensaje: "Compra no encontrada" });
+
+    await compra.destroy();
+    res.json({ mensaje: "Compra eliminada correctamente" });
+
+  } catch (error) {
+    return res.status(500).json({ mensaje: "Error al eliminar la compra", error: error.message });
+  }
+};
+
+// Actualizar compra
+export const actualizarCompraArbol = async (req, res) => {
+  try {
+    const compra = await ArbolCompra.findByPk(req.params.id);
+    if (!compra) return res.status(404).json({ mensaje: "Compra no encontrada" });
+
+    const tipoArbol = req.body.tipoArbol;
+    const cantidad = req.body.cantidad;
+
+    if (!tipoArbol || !(tipoArbol in ARBOLES)) {
+      return res.status(400).json({ mensaje: "Tipo de arbol no existe" });
+    }
+    if (Number.isNaN(cantidad) || cantidad <= 0) {
+      return res.status(400).json({ mensaje: "Cantidad debe ser un número mayor a 0." });
+    }
+
+    const { precio, rebajaTotal, subtotal, descuentoValor, iva, totalPagar } = calcularValores(
+      tipoArbol,
+      cantidad
+    );
+
+    await compra.update({
+      tipoArbol,
+      precioUnitario: precio,
+      cantidad,
+      rebaja: rebajaTotal,
+      subtotal,
+      descuentoValor,
+      subtotalConDescuento,
+      iva,
+      totalPagar,
+    });
+
+    return res.json(compra);
+
+  } catch (error) {
+    return res.status(500).json({ mensaje: "Error al actualizar la compra", error: error.message });
+  }
+};

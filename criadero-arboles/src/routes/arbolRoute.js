@@ -1,24 +1,29 @@
-import express from 'express';
+import {Router} from 'express';
+
 import {
-  crearArbol,
-  listarArboles,
-  buscarArbolId,
-  actualizarArbol,
-  eliminarArbol,
-  calcularPrecioArbol
+  calcularCompraArboles,
+  listarComprasArboles,
+  obtenerCompraArbolPorId,
+  actualizarCompraArbol,
+  eliminarCompraArbol
 } from '../controllers/arbolController.js';
 
-const router = express.Router();
+const router = Router();
 
-// Rutas REST para /api/arboles
-router.get('/', listarArboles);
-router.get('/:id', buscarArbolId);
-router.post('/', crearArbol);
-router.put('/:id', actualizarArbol);
-router.delete('/:id', eliminarArbol);
+// POST - Calcular y crear compra
+router.post('/calcular', calcularCompraArboles);
 
-// Ruta para cálculo de precio con descuentos e IVA
-router.post('/calcular', calcularPrecioArbol);
+// GET - Listar todas las compras
+router.get('/', listarComprasArboles);
+
+// GET - Obtener compra por ID
+router.get('/:id', obtenerCompraArbolPorId);
+
+// PUT - Actualizar compra
+router.put('/:id', actualizarCompraArbol);
+
+// DELETE - Eliminar compra
+router.delete('/:id', eliminarCompraArbol);
 
 export default router;
 

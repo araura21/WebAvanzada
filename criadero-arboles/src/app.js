@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
 import arbolRoute from './routes/arbolRoute.js';
-import { dbConnect } from './config/database.js';
+import { dbConnect, sequelize } from './config/database.js';
 
 dotenv.config();
 
@@ -13,17 +14,24 @@ app.use(express.json());
 // Rutas
 app.use('/api/arboles', arbolRoute);
 
+//Ruta base para evitar Cannot Get
+app.get('/', (req, res) =>{
+	res.send('API criadero de arboles funcionando');
+});
+
 const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
 
 // Conectar a la base de datos y arrancar servidor
 dbConnect()
-	.then(() => {
-		app.listen(PORT, () => console.log(`Servidor iniciado en http://localhost:${PORT}`));
-	})
-	.catch((err) => {
-		console.error('No se pudo iniciar el servidor:', err.message);
+	sequelize.sync({alter: true}).then(() => {
+		console.log('Base de datos sincronizada');
+	}).catch((err) => {
+		console.error('Error al sincronizar la base de datos:', err.message);
 	});
 
-export default app;
+
 
 
