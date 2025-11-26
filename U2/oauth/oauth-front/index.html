@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Banco Bandido de Peluche - Cálculo Financiero</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <!-- JS -->
+  <script defer src="app.js"></script>
+</head>
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Login - OAuth App</title>
+</head>
+<body>
+  <h1>Iniciar Sesión</h1>
+
+  <div id="login-section">
+    <form id="login-form">
+      <label>
+        Usuario:<br>
+        <input type="text" id="username" name="username" required>
+      </label>
+      <br><br>
+      <label>
+        Contraseña:<br>
+        <input type="password" id="password" name="password" required>
+      </label>
+      <br><br>
+      <button type="submit">Ingresar</button>
+    </form>
+
+    <div id="login-error" style="color: red; display: none;"></div>
+  </div>
+
+  <div id="profile-section" style="display: none;">
+    <h2>Perfil</h2>
+
+    <label>ID: <span id="profile-id"></span></label><br>
+    <label>Usuario: <span id="profile-username"></span></label><br>
+    <label>Nombre completo: <span id="profile-nombreCompleto"></span></label><br>
+    <label>Email: <span id="profile-email"></span></label><br><br>
+
+    <button id="logout-btn">Cerrar sesión</button>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
