@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ClienteService from '../services/clienteServices.js';
 import Validaciones from './Validaciones.js';
 
-const ClientesForm = ({ onClienteGuardado }) => {
+const ClientesForm = ({ onClienteGuardado, selectedClient, onCancel }) => {
     const [formData, setFormData] = useState({
         nombre: '',
         cedula: '',
@@ -11,6 +11,28 @@ const ClientesForm = ({ onClienteGuardado }) => {
         montoCompras: '',
         pagoRealizado: ''
     });
+
+    useEffect(() => {
+        if (selectedClient) {
+            setFormData({
+                nombre: selectedClient.nombre,
+                cedula: selectedClient.cedula,
+                telefono: selectedClient.telefono,
+                saldoAnterior: selectedClient.saldoActual,
+                montoCompras: '',
+                pagoRealizado: ''
+            });
+        } else {
+            setFormData({
+                nombre: '',
+                cedula: '',
+                telefono: '',
+                saldoAnterior: '',
+                montoCompras: '',
+                pagoRealizado: ''
+            });
+        }
+    }, [selectedClient]);
 
     const handleChange = (e) => {
         setFormData({
@@ -49,7 +71,7 @@ const ClientesForm = ({ onClienteGuardado }) => {
 
             const response = await ClienteService.calcular(data);
             if (response.ok) {
-                alert('Cliente calculado y guardado con éxito');
+                alert('Transacción guardada con éxito');
                 setFormData({ nombre: '', cedula: '', telefono: '', saldoAnterior: '', montoCompras: '', pagoRealizado: '' });
                 if (onClienteGuardado) onClienteGuardado();
             } else {
@@ -62,7 +84,15 @@ const ClientesForm = ({ onClienteGuardado }) => {
 
     return (
         <div className="card">
-            <h3>Registro de Cliente</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3>{selectedClient ? `Nuevo Pago: ${selectedClient.nombre}` : 'Registro de Cliente'}</h3>
+                {selectedClient && (
+                    <button onClick={onCancel} style={{ backgroundColor: '#dc3545', width: 'auto', padding: '5px 10px' }}>
+                        Cancelar / Nuevo Cliente
+                    </button>
+                )}
+            </div>
+
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>Nombre del Cliente</label>
@@ -73,6 +103,9 @@ const ClientesForm = ({ onClienteGuardado }) => {
                         onChange={handleChange}
                         required
                         className="form-control"
+                        disabled={!!selectedClient}
+                        placeholder="Ingrese el nombre del cliente"
+
                     />
                 </div>
                 <div className="form-group">
@@ -84,6 +117,9 @@ const ClientesForm = ({ onClienteGuardado }) => {
                         onChange={handleChange}
                         required
                         className="form-control"
+                        disabled={!!selectedClient}
+                        placeholder="Ingrese la cédula del cliente"
+                        maxLength={10}
                     />
                 </div>
                 <div className="form-group">
@@ -95,10 +131,13 @@ const ClientesForm = ({ onClienteGuardado }) => {
                         onChange={handleChange}
                         required
                         className="form-control"
+                        disabled={!!selectedClient}
+                        placeholder="Ingrese el teléfono del cliente"
+                        maxLength={10}
                     />
                 </div>
                 <div className="form-group">
-                    <label>Saldo Anterior</label>
+                    <label>Saldo Anterior {selectedClient && '(Automático del último corte)'}</label>
                     <input
                         type="number"
                         name="saldoAnterior"
@@ -106,10 +145,11 @@ const ClientesForm = ({ onClienteGuardado }) => {
                         onChange={handleChange}
                         required
                         step="0.01"
+                        disabled={!!selectedClient}
                     />
                 </div>
                 <div className="form-group">
-                    <label>Monto de Compras</label>
+                    <label>Monto de Compras (Nuevo)</label>
                     <input
                         type="number"
                         name="montoCompras"
@@ -120,7 +160,7 @@ const ClientesForm = ({ onClienteGuardado }) => {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Pago Realizado</label>
+                    <label>Pago Realizado (Nuevo)</label>
                     <input
                         type="number"
                         name="pagoRealizado"
