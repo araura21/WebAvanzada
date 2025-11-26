@@ -4,8 +4,10 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-const ClientesList = () => {
+const ClientesList = ({ onSeleccionarCliente }) => {
     const [clientes, setClientes] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const cargarClientes = async () => {
         try {
@@ -22,33 +24,65 @@ const ClientesList = () => {
         cargarClientes();
     }, []);
 
-    const generarPDFHistorial = (cliente) => {
+    // Pagination Logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = clientes.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(clientes.length / itemsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const generarPDFEstadoCuenta = (cliente) => {
         const doc = new jsPDF();
 
         doc.setFontSize(18);
-        doc.text(`Historial del Cliente: ${cliente.nombre}`, 14, 22);
+        doc.text(`Estado de Cuenta: ${cliente.nombre}`, 14, 22);
 
         doc.setFontSize(12);
-        doc.text(`Fecha de Reporte: ${new Date().toLocaleDateString()}`, 14, 30);
+        doc.text(`Fecha de Corte: ${new Date(cliente.createdAt).toLocaleDateString()}`, 14, 30);
+        doc.text(`Cédula: ${cliente.cedula || 'N/A'}`, 14, 36);
 
         const tableColumn = ["Concepto", "Valor"];
         const tableRows = [
-            ["Cédula", cliente.cedula || 'N/A'],
-            ["Teléfono", cliente.telefono || 'N/A'],
             ["Saldo Anterior", `$${cliente.saldoAnterior.toFixed(2)}`],
-            ["Monto Compras", `$${cliente.montoCompras.toFixed(2)}`],
-            ["Pago Realizado", `$${cliente.pagoRealizado.toFixed(2)}`],
-            [
-                "Saldo Base",
-                `$${(cliente.saldoAnterior + cliente.montoCompras - cliente.pagoRealizado).toFixed(2)}`
-            ],
-            ["Es Moroso", cliente.esMoroso ? "SÍ" : "NO"],
-            ["Interés Generado", `$${cliente.interes.toFixed(2)}`],
-            ["Multa", `$${cliente.multa.toFixed(2)}`],
+            ["Compras del Período", `$${cliente.montoCompras.toFixed(2)}`],
+            ["Pagos Realizados", `-$${cliente.pagoRealizado.toFixed(2)}`],
+            ["----------------", "----------------"],
             ["Saldo Actual", `$${cliente.saldoActual.toFixed(2)}`],
             ["Pago Mínimo", `$${cliente.pagoMinimo.toFixed(2)}`],
-            ["Pago No Intereses", `$${cliente.pagoNoIntereses.toFixed(2)}`]
+            ["Pago para no generar intereses", `$${cliente.pagoNoIntereses.toFixed(2)}`],
+            ["Interés Generado", `$${cliente.interes.toFixed(2)}`],
+            ["Multa", `$${cliente.multa.toFixed(2)}`],
+            ["Estado", cliente.esMoroso ? "MOROSO" : "AL DÍA"]
         ];
+
+        autoTable(doc, {
+            startY: 45,
+            head: [tableColumn],
+            body: tableRows,
+        });
+
+        doc.save(`estado_cuenta_${cliente.nombre}_${new Date().getTime()}.pdf`);
+    };
+
+    const generarPDFHistorialCompleto = (cliente) => {
+        const doc = new jsPDF();
+        const historial = clientes.filter(c => c.cedula === cliente.cedula).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+        doc.setFontSize(18);
+        doc.text(`Historial Completo: ${cliente.nombre}`, 14, 22);
+        doc.setFontSize(12);
+        doc.text(`Cédula: ${cliente.cedula || 'N/A'}`, 14, 30);
+
+        const tableColumn = ["Fecha", "Saldo Ant.", "Compras", "Pagos", "Saldo Act.", "Estado"];
+        const tableRows = historial.map(reg => [
+            new Date(reg.createdAt).toLocaleDateString(),
+            `$${reg.saldoAnterior.toFixed(2)}`,
+            `$${reg.montoCompras.toFixed(2)}`,
+            `$${reg.pagoRealizado.toFixed(2)}`,
+            `$${reg.saldoActual.toFixed(2)}`,
+            reg.esMoroso ? "Moroso" : "Al día"
+        ]);
 
         autoTable(doc, {
             startY: 40,
@@ -56,7 +90,16 @@ const ClientesList = () => {
             body: tableRows,
         });
 
-        doc.save(`historial_${cliente.nombre}.pdf`);
+        doc.save(`historial_completo_${cliente.nombre}.pdf`);
+    };
+
+    const handleNuevoPago = (cliente) => {
+        // Encontrar el último registro de este cliente (asumiendo que 'clientes' viene ordenado DESC por fecha o lo ordenamos)
+        // El backend devuelve ordenado por createdAt DESC, así que el primero que encontremos con esa cédula es el último.
+        const ultimoRegistro = clientes.find(c => c.cedula === cliente.cedula);
+        if (ultimoRegistro) {
+            onSeleccionarCliente(ultimoRegistro);
+        }
     };
 
     const exportarExcel = () => {
@@ -72,7 +115,8 @@ const ClientesList = () => {
             "Pago Mínimo": cliente.pagoMinimo,
             "Pago No Intereses": cliente.pagoNoIntereses,
             "Interés": cliente.interes,
-            "Multa": cliente.multa
+            "Multa": cliente.multa,
+            "Fecha Registro": new Date(cliente.createdAt).toLocaleDateString()
         })));
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Clientes");
@@ -110,7 +154,6 @@ const ClientesList = () => {
                         <tr>
                             <th>Nombre</th>
                             <th>Cédula</th>
-                            <th>Teléfono</th>
                             <th>Saldo Actual</th>
                             <th>Pago Mínimo</th>
                             <th>Moroso</th>
@@ -118,34 +161,43 @@ const ClientesList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {clientes.length > 0 ? (
-                            clientes.map((cliente) => (
+                        {currentItems.length > 0 ? (
+                            currentItems.map((cliente) => (
                                 <tr key={cliente.id}>
                                     <td>{cliente.nombre}</td>
                                     <td>{cliente.cedula || 'N/A'}</td>
-                                    <td>{cliente.telefono || 'N/A'}</td>
                                     <td>${cliente.saldoActual.toFixed(2)}</td>
                                     <td>${cliente.pagoMinimo.toFixed(2)}</td>
                                     <td className={cliente.esMoroso ? "text-danger" : "text-success"}>
                                         {cliente.esMoroso ? "SÍ" : "NO"}
                                     </td>
                                     <td>
-                                        <button
-                                            onClick={() => generarPDFHistorial(cliente)}
-                                            style={{
-                                                width: 'auto',
-                                                padding: '5px 10px',
-                                                fontSize: '0.8rem'
-                                            }}
-                                        >
-                                            Ver Historial (PDF)
-                                        </button>
+                                        <div style={{ display: 'flex', gap: '5px', flexDirection: 'column' }}>
+                                            <button
+                                                onClick={() => handleNuevoPago(cliente)}
+                                                style={{ padding: '5px', fontSize: '0.8rem', backgroundColor: '#007bff', color: 'white' }}
+                                            >
+                                                Nuevo Pago
+                                            </button>
+                                            <button
+                                                onClick={() => generarPDFEstadoCuenta(cliente)}
+                                                style={{ padding: '5px', fontSize: '0.8rem' }}
+                                            >
+                                                Estado Cuenta (PDF)
+                                            </button>
+                                            <button
+                                                onClick={() => generarPDFHistorialCompleto(cliente)}
+                                                style={{ padding: '5px', fontSize: '0.8rem', backgroundColor: '#6c757d', color: 'white' }}
+                                            >
+                                                Historial (PDF)
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="7" style={{ textAlign: 'center' }}>
+                                <td colSpan="6" style={{ textAlign: 'center' }}>
                                     No hay clientes registrados
                                 </td>
                             </tr>
@@ -153,6 +205,29 @@ const ClientesList = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', gap: '10px' }}>
+                    <button
+                        onClick={() => paginate(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        style={{ width: 'auto', padding: '5px 10px' }}
+                    >
+                        Anterior
+                    </button>
+                    <span style={{ alignSelf: 'center' }}>
+                        Página {currentPage} de {totalPages}
+                    </span>
+                    <button
+                        onClick={() => paginate(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        style={{ width: 'auto', padding: '5px 10px' }}
+                    >
+                        Siguiente
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
