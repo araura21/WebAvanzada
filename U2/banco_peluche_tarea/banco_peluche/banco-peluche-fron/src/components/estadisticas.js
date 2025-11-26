@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import ClienteService from '../services/clienteServices';
+import ClienteService from '../services/clienteServices.js';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Pie } from 'react-chartjs-2';
@@ -111,7 +111,7 @@ const Estadisticas = () => {
                         </div>
 
                         {/* Clientes NO Morosos */}
-                        <div style={{ background: 'var(--card-bg)', padding: '20px', borderRadius: '8px', textAlign: 'center'}}>
+                        <div style={{ background: 'var(--card-bg)', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
                             <h4 style={{ marginTop: 0, marginBottom: '10px', fontSize: '0.9rem', color: 'var(--text-color)' }}>Clientes NO Morosos</h4>
                             <p style={{ fontSize: '2.2rem', fontWeight: 'bold', margin: '10px 0', color: 'var(--success-color)' }}>{noMorosos}</p>
                             <p style={{ fontSize: '0.85rem', color: 'var(--text-color)', margin: '5px 0 0 0' }}>
@@ -122,7 +122,7 @@ const Estadisticas = () => {
                     </div>
                     {/* Lado Derecho - Morosos y Ganancias */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    
+
                         <div style={{ background: 'var(--card-bg)', padding: '15px', borderRadius: '8px', textAlign: 'center' }}>
                             <h4 style={{ marginTop: 0 }}>Ganancia Intereses</h4>
                             <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '10px 0', color: 'var(--success-color)' }}>${Number(stats.gananciaIntereses).toFixed(2)}</p>

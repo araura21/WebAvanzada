@@ -5,7 +5,7 @@ class ClienteController {
 
   static async calcular(req, res) {
     try {
-      const { nombre, saldoAnterior, montoCompras, pagoRealizado } = req.body;
+      const { nombre, cedula, telefono, saldoAnterior, montoCompras, pagoRealizado } = req.body;
 
       // Validaciones básicas
       if (saldoAnterior < 0 || montoCompras < 0 || pagoRealizado < 0) {
@@ -14,8 +14,8 @@ class ClienteController {
       if (isNaN(saldoAnterior) || isNaN(montoCompras) || isNaN(pagoRealizado)) {
         return res.status(400).json({ ok: false, msg: "Los valores deben ser numéricos" });
       }
-      if (!nombre) {
-        return res.status(400).json({ ok: false, msg: "El nombre es requerido" });
+      if (!nombre || !cedula || !telefono) {
+        return res.status(400).json({ ok: false, msg: "Nombre, cédula y teléfono son requeridos" });
       }
 
       // Calcular datos
@@ -24,6 +24,8 @@ class ClienteController {
       // Guardar en Base de Datos
       const nuevoCliente = await Cliente.create({
         nombre,
+        cedula,
+        telefono,
         ...calculo
       });
 

@@ -16,7 +16,7 @@ app.use('/api/clientes', clienteRoutes);
 const iniciarServidor = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync(); // Crea tablas si no existen
+    await sequelize.sync({ alter: true }); // Crea tablas si no existen o las actualiza
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => console.log(`Servidor Banco Bandido ejecutándose en el puerto ${PORT}`));
   } catch (error) {

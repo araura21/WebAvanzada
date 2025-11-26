@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import ClienteService from '../services/clienteServices';
+import ClienteService from '../services/clienteServices.js';
+import Validaciones from './Validaciones.js';
 
 const ClientesForm = ({ onClienteGuardado }) => {
     const [formData, setFormData] = useState({
         nombre: '',
+        cedula: '',
+        telefono: '',
         saldoAnterior: '',
         montoCompras: '',
         pagoRealizado: ''
@@ -18,9 +21,27 @@ const ClientesForm = ({ onClienteGuardado }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!Validaciones.validarCedula(formData.cedula)) {
+            alert('Cédula inválida');
+            return;
+        }
+        if (!Validaciones.validarTelefono(formData.telefono)) {
+            alert('Teléfono inválido (debe tener 10 dígitos)');
+            return;
+        }
+        if (!Validaciones.validarNoNegativo(Number(formData.saldoAnterior)) ||
+            !Validaciones.validarNoNegativo(Number(formData.montoCompras)) ||
+            !Validaciones.validarNoNegativo(Number(formData.pagoRealizado))) {
+            alert('Los valores monetarios no pueden ser negativos');
+            return;
+        }
+
         try {
             const data = {
                 nombre: formData.nombre,
+                cedula: formData.cedula,
+                telefono: formData.telefono,
                 saldoAnterior: Number(formData.saldoAnterior),
                 montoCompras: Number(formData.montoCompras),
                 pagoRealizado: Number(formData.pagoRealizado)
@@ -29,7 +50,7 @@ const ClientesForm = ({ onClienteGuardado }) => {
             const response = await ClienteService.calcular(data);
             if (response.ok) {
                 alert('Cliente calculado y guardado con éxito');
-                setFormData({ nombre: '', saldoAnterior: '', montoCompras: '', pagoRealizado: '' });
+                setFormData({ nombre: '', cedula: '', telefono: '', saldoAnterior: '', montoCompras: '', pagoRealizado: '' });
                 if (onClienteGuardado) onClienteGuardado();
             } else {
                 alert('Error: ' + response.msg);
@@ -49,6 +70,28 @@ const ClientesForm = ({ onClienteGuardado }) => {
                         type="text"
                         name="nombre"
                         value={formData.nombre}
+                        onChange={handleChange}
+                        required
+                        className="form-control"
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Cédula</label>
+                    <input
+                        type="text"
+                        name="cedula"
+                        value={formData.cedula}
+                        onChange={handleChange}
+                        required
+                        className="form-control"
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Teléfono</label>
+                    <input
+                        type="text"
+                        name="telefono"
+                        value={formData.telefono}
                         onChange={handleChange}
                         required
                         className="form-control"

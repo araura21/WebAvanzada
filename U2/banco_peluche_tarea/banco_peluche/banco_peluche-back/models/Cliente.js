@@ -11,6 +11,14 @@ const Cliente = sequelize.define('Cliente', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  cedula: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  telefono: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   saldoAnterior: {
     type: DataTypes.FLOAT,
     allowNull: false
