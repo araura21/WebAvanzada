@@ -1,13 +1,13 @@
 import { useState } from "react";
-
-function ProductForm({onCrear}){ //funcion enviadda desde el app.js, es ejecutada cuando se presiona un bton
+import "../App.css";
+function ProductForm({ onCrear }) { //funcion enviadda desde el app.js, es ejecutada cuando se presiona un bton
     const [title, setTitle] = useState("");
     const [price, setPrice] = useState("");
 
-    function manejarSubmit(e){
+    function manejarSubmit(e) {
         e.preventDefault(); //evita que se recargue la pagina
 
-        if(title.trim() === "" || price === "") return;
+        if (title.trim() === "" || price === "") return;
 
         const nuevoProducto = {
             title,
@@ -21,28 +21,28 @@ function ProductForm({onCrear}){ //funcion enviadda desde el app.js, es ejecutad
     }
 
     return (
-        <div style={{ marginBottom: "20px", border: "1px solid #ccc", padding: "15px" }}>
+        <div className="product-form-container">
             <h2>Agregar Producto</h2>
             <form onSubmit={manejarSubmit}>
-                <div style={{ marginBottom: "10px" }}>
+                <div className="form-group">
                     <label>Título: </label>
-                    <input 
-                        type="text" 
-                        value={title} 
-                        onChange={(e) => setTitle(e.target.value)} 
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
                         placeholder="Nombre del producto"
                     />
                 </div>
-                <div style={{ marginBottom: "10px" }}>
+                <div className="form-group">
                     <label>Precio: </label>
-                    <input 
-                        type="number" 
-                        value={price} 
-                        onChange={(e) => setPrice(e.target.value)} 
+                    <input
+                        type="number"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
                         placeholder="Precio"
                     />
                 </div>
-                <button type="submit">Agregar Producto</button>
+                <button type="submit" className="submit-button">Agregar Producto</button>
             </form>
         </div>
     );
