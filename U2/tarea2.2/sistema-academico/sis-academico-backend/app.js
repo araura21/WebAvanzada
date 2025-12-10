@@ -1,8 +1,11 @@
 import express from "express";
+import cors from "cors";
 import sequelize from "./src/config/database.js";
 import estudianteRoutes from "./src/routes/estudiante.routes.js";
 import authRoutes from "./src/routes/auth.routes.js";
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 
 
