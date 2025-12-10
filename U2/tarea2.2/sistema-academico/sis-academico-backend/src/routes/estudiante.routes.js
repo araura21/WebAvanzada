@@ -7,6 +7,8 @@ import {
   actualizarEstudiante,
   eliminarEstudiante,
 } from "../controllers/estudiante.controller.js";
+import { verificarToken } from "../middlewares/auth.middleware.js";
+
 
 const router = Router();
 import upload from "../config/multer.js";
@@ -18,6 +20,9 @@ router.post(
 );
 router.get("/", obtenerEstudiantes);
 router.get("/buscar/:termino", buscarEstudiante);
+
+router.get("/", verificarToken, obtenerEstudiantes);
+router.post("/", verificarToken, crearEstudiante);
 
 router.put("/:id", actualizarEstudiante);
 router.delete("/:id", eliminarEstudiante);
