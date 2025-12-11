@@ -8,23 +8,22 @@ import {
   eliminarEstudiante,
 } from "../controllers/estudiante.controller.js";
 import { verificarToken } from "../middlewares/auth.middleware.js";
-
-
-const router = Router();
 import upload from "../config/multer.js";
 
+const router = Router();
+
+// Rutas públicas (sin autenticación)
+router.get("/", obtenerEstudiantes);
+router.get("/buscar/:termino", buscarEstudiante);
 router.post(
   "/",
   upload.single("foto"),
   crearEstudiante
 );
-router.get("/", obtenerEstudiantes);
-router.get("/buscar/:termino", buscarEstudiante);
 
-router.get("/", verificarToken, obtenerEstudiantes);
-router.post("/", verificarToken, crearEstudiante);
+// Rutas protegidas (con autenticación y multer para upload de foto)
 
-router.put("/:id", actualizarEstudiante);
-router.delete("/:id", eliminarEstudiante);
+router.put("/:id", verificarToken, actualizarEstudiante);
+router.delete("/:id", verificarToken, eliminarEstudiante);
 
 export default router;

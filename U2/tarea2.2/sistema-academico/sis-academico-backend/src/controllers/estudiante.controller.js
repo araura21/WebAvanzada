@@ -35,16 +35,54 @@ export const buscarEstudiante = async (req, res) => {
 
 export const crearEstudiante = async (req, res) => {
   try {
-    const data = req.body;
+    const { cedula, nombres, apellidos, correo, telefono, curso, paralelo } = req.body;
 
+    // Validaciones
+    if (!cedula || !nombres || !apellidos || !correo) {
+      return res.status(400).json({ 
+        mensaje: "Campos requeridos: cedula, nombres, apellidos, correo" 
+      });
+    }
+
+    const data = {
+      cedula: cedula.trim(),
+      nombres: nombres.trim(),
+      apellidos: apellidos.trim(),
+      correo: correo.trim().toLowerCase(),
+      telefono: telefono || null,
+      curso: curso || null,
+      paralelo: paralelo || null,
+      estado: "activo"
+    };
+
+    // Verificar si hay archivo de foto
     if (req.file) {
       data.foto = "uploads/estudiantes/" + req.file.filename;
     }
 
+    // Crear el estudiante en la BD
     const nuevo = await Estudiante.create(data);
-    res.status(201).json(nuevo);
+    
+    res.status(201).json({ 
+      mensaje: "Estudiante registrado exitosamente",
+      id: nuevo.id,
+      estudiante: nuevo 
+    });
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al crear estudiante", error });
+    console.error("Error al crear estudiante:", error);
+    
+    // Manejar errores específicos de validación
+    if (error.name === "SequelizeUniqueConstraintError") {
+      const campo = error.errors[0].path;
+      return res.status(400).json({ 
+        mensaje: `El ${campo} ya existe en la base de datos` 
+      });
+    }
+
+    res.status(500).json({ 
+      mensaje: "Error al crear estudiante", 
+      error: error.message 
+    });
   }
 };
 

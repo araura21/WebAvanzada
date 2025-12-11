@@ -1,6 +1,8 @@
 import API_URL from "./api.service";
 
 export const crearEstudiante = async (formData) => {
+  // NO agregar header Content-Type, FormData lo hace automáticamente
+  // NO agregar Authorization para registro público
   const response = await fetch(`${API_URL}/estudiantes`, {
     method: "POST",
     body: formData,
