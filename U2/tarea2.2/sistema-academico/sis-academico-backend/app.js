@@ -7,6 +7,11 @@ import docenteRoutes from "./src/routes/docente.routes.js";
 import notaRoutes from "./src/routes/nota.routes.js";
 import asignaturaRoutes from "./src/routes/asignatura.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
+import matriculaRoutes from "./src/routes/matricula.routes.js";
+import { setupAssociations } from "./src/models/associations.js";
+
+// Init associations
+setupAssociations();
 
 const app = express();
 
@@ -28,6 +33,7 @@ app.use("/api/estudiantes", estudianteRoutes);
 app.use("/api/docentes", docenteRoutes);
 app.use("/api/notas", notaRoutes);
 app.use("/api/asignaturas", asignaturaRoutes);
+app.use("/api/matriculas", matriculaRoutes);
 
 (async () => {
   try {

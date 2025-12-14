@@ -12,6 +12,7 @@ import Sidebar from '../components/layout/sidebar';
 
 // Admin Pages
 import GestionUsuarios from '../pages/admin/GestionUsuarios';
+import GestionAsignaturas from '../pages/admin/GestionAsignaturas';
 
 // Estudiante Pages
 import DashboardEstudiante from '../pages/estudiante/DashboardEstudiante';
@@ -22,6 +23,7 @@ import PerfilEstudiante from '../pages/estudiante/PerfilEstudiante';
 import DashboardDocente from '../pages/docente/DashboardDocente';
 import GestionEstudiantes from '../pages/docente/GestionEstudiantes';
 import GestionNotas from '../pages/docente/GestionNotas';
+import GestionMatriculas from '../pages/docente/GestionMatriculas';
 
 const DefaultRedirect = () => {
     const rol = localStorage.getItem('rol');
@@ -64,8 +66,8 @@ const AppRoutes = ({ isAuthenticated, onLogout }) => {
                         <Route path="/notas" element={<ProtectedRoute allowedRoles={['admin']}><NotasPage /></ProtectedRoute>} />
                         <Route path="/notas/crear" element={<ProtectedRoute allowedRoles={['admin']}><NotaForm /></ProtectedRoute>} />
                         <Route path="/notas/editar/:id" element={<ProtectedRoute allowedRoles={['admin']}><NotaForm /></ProtectedRoute>} />
-
                         <Route path="/admin/usuarios" element={<ProtectedRoute allowedRoles={['admin']}><GestionUsuarios /></ProtectedRoute>} />
+                        <Route path="/admin/asignaturas" element={<ProtectedRoute allowedRoles={['admin']}><GestionAsignaturas /></ProtectedRoute>} />
 
                         {/* Estudiante Routes */}
                         <Route path="/estudiante/dashboard" element={<ProtectedRoute allowedRoles={['estudiante']}><DashboardEstudiante /></ProtectedRoute>} />
@@ -76,6 +78,7 @@ const AppRoutes = ({ isAuthenticated, onLogout }) => {
                         <Route path="/docente/dashboard" element={<ProtectedRoute allowedRoles={['docente']}><DashboardDocente /></ProtectedRoute>} />
                         <Route path="/docente/estudiantes" element={<ProtectedRoute allowedRoles={['docente']}><GestionEstudiantes /></ProtectedRoute>} />
                         <Route path="/docente/notas" element={<ProtectedRoute allowedRoles={['docente']}><GestionNotas /></ProtectedRoute>} />
+                        <Route path="/docente/matriculas" element={<ProtectedRoute allowedRoles={['docente']}><GestionMatriculas /></ProtectedRoute>} />
 
                         <Route path="/ayuda" element={<Ayuda />} />
                         <Route path="*" element={<DefaultRedirect />} />

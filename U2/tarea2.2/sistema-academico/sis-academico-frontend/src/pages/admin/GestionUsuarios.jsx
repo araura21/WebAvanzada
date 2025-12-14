@@ -105,6 +105,27 @@ const GestionUsuarios = () => {
         }
     };
 
+    const handleReactivate = async (id) => {
+        if (!window.confirm('¿Desea reactivar este usuario?')) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`http://localhost:3000/api/users/${id}/activate`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                setSuccess("Usuario reactivado correctamente");
+                fetchUsuarios();
+            } else {
+                throw new Error("No se pudo reactivar");
+            }
+        } catch (e) {
+            setError(e.message);
+        }
+    };
+
     return (
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -141,12 +162,22 @@ const GestionUsuarios = () => {
                                             {u.rol.toUpperCase()}
                                         </Badge>
                                     </td>
-                                    <td><Badge bg="success">ACTIVO</Badge></td>
+                                    <td>
+                                        <Badge bg={!u.estado ? 'secondary' : 'success'}>
+                                            {u.estado ? 'ACTIVO' : 'INACTIVO'}
+                                        </Badge>
+                                    </td>
                                     <td>{new Date(u.createdAt).toLocaleDateString()}</td>
                                     <td>
-                                        <Button variant="outline-danger" size="sm" onClick={() => handleDelete(u.id)}>
-                                            <i className="bi bi-trash"></i>
-                                        </Button>
+                                        {!u.estado ? (
+                                            <Button variant="outline-success" size="sm" onClick={() => handleReactivate(u.id)} title="Reactivar Usuario">
+                                                <i className="bi bi-arrow-counterclockwise"></i>
+                                            </Button>
+                                        ) : (
+                                            <Button variant="outline-danger" size="sm" onClick={() => handleDelete(u.id)} title="Eliminar Usuario">
+                                                <i className="bi bi-trash"></i>
+                                            </Button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

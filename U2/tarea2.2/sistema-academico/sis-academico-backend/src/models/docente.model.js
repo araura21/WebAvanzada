@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
-import {Asignatura} from "./asignatura.model.js";
+import { Asignatura } from "./asignatura.model.js";
 
 const Docente = sequelize.define("Docente", {
   id: {
@@ -36,11 +36,11 @@ const Docente = sequelize.define("Docente", {
     unique: true,
   },
 
-  especialidad:{
+  especialidad: {
     type: DataTypes.STRING(32),
     allowNull: false,
   },
-  
+
   foto: {
     type: DataTypes.STRING(255),
     allowNull: true,
@@ -57,7 +57,9 @@ const Docente = sequelize.define("Docente", {
 });
 
 //Relaciones
-Docente.hasMany(Asignatura, {foreignKey: "docenteId", as: "asignaturas"});
-Asignatura.belongsTo(Docente, {foreignKey: "docenteId", as: "docente"});
+// Relaciones definidas en un archivo de carga o al final para evitar ciclos si fuera bidireccional
+// En este caso Asignatura no dependía de Docente, así que está bien.
+// Pero para mejor orden, dejaremos que Asignatura también tenga el foreign key
+
 
 export default Docente;

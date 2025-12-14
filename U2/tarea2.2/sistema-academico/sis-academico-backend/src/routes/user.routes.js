@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUsers, createUser, deleteUser } from "../controllers/user.controller.js";
+import { getUsers, createUser, deleteUser, reactivateUser } from "../controllers/user.controller.js";
 import { verificarToken } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -8,5 +8,6 @@ const router = Router();
 router.get("/", verificarToken, getUsers);
 router.post("/", verificarToken, createUser);
 router.delete("/:id", verificarToken, deleteUser);
+router.put("/:id/activate", verificarToken, reactivateUser);
 
 export default router;

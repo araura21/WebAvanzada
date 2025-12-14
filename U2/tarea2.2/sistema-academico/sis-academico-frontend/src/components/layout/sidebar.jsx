@@ -25,7 +25,12 @@ const Sidebar = () => {
               </li>
               <li>
                 <Link to="/admin/usuarios" className={isActive('/admin/usuarios')}>
-                  <i className="bi bi-people"></i> Gestión Usuarios
+                  <i className="bi bi-people"></i> Usuarios
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/asignaturas" className={isActive('/admin/asignaturas')}>
+                  <i className="bi bi-book"></i> Asignaturas
                 </Link>
               </li>
               <li>
@@ -51,6 +56,11 @@ const Sidebar = () => {
               <li>
                 <Link to="/docente/notas" className={isActive('/docente/notas')}>
                   <i className="bi bi-journal-text"></i> Notas
+                </Link>
+              </li>
+              <li>
+                <Link to="/docente/matriculas" className={isActive('/docente/matriculas')}>
+                  <i className="bi bi-pencil-square"></i> Matricular
                 </Link>
               </li>
             </>

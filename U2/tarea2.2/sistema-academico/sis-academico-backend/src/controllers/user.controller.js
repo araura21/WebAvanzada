@@ -48,9 +48,19 @@ export const createUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-        await Usuario.destroy({ where: { id } });
-        res.json({ message: "Usuario eliminado" });
-    } catch (error) {
-        res.status(500).json({ message: "Error al eliminar usuario", error });
+        await Usuario.update({ estado: false }, { where: { id } });
+        res.json({ message: "Usuario desactivado" });
+    } catch (e) {
+        res.status(500).json({ message: "Error al eliminar usuario" });
+    }
+};
+
+export const reactivateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Usuario.update({ estado: true }, { where: { id } });
+        res.json({ message: "Usuario reactivado exitosamente" });
+    } catch (e) {
+        res.status(500).json({ message: "Error al reactivar usuario" });
     }
 };

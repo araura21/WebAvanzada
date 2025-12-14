@@ -16,3 +16,19 @@ export const verificarToken = (req, res, next) => {
     next();
   });
 };
+
+export const esDocente = (req, res, next) => {
+  if (req.usuario && req.usuario.rol === 'docente') {
+    next();
+  } else {
+    res.status(403).json({ mensaje: "Acceso denegado: Se requiere rol Docente" });
+  }
+};
+
+export const esAdmin = (req, res, next) => {
+  if (req.usuario && req.usuario.rol === 'admin') {
+    next();
+  } else {
+    res.status(403).json({ mensaje: "Acceso denegado: Se requiere rol Admin" });
+  }
+};
