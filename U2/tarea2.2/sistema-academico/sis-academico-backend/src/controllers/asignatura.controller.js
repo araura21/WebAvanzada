@@ -11,8 +11,12 @@ export const getAsignaturas = async (req, res) => {
 
 export const createAsignatura = async (req, res) => {
   try {
-    const { nombre, descripcion } = req.body;
-    const nuevaAsignatura = await Asignatura.create({ nombre, descripcion });
+    const { nombre, descripcion, docenteId } = req.body;
+    const nuevaAsignatura = await Asignatura.create({
+      nombre,
+      descripcion,
+      usuarioId: docenteId || null
+    });
     res.status(201).json(nuevaAsignatura);
   } catch (error) {
     res.status(500).json({ message: "Error al crear asignatura", error });
@@ -22,7 +26,7 @@ export const createAsignatura = async (req, res) => {
 export const updateAsignatura = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, descripcion } = req.body;
+    const { nombre, descripcion, docenteId } = req.body;
 
     const asignatura = await Asignatura.findByPk(id);
 
@@ -30,7 +34,11 @@ export const updateAsignatura = async (req, res) => {
       return res.status(404).json({ message: "Asignatura no encontrada" });
     }
 
-    await asignatura.update({ nombre, descripcion });
+    await asignatura.update({
+      nombre,
+      descripcion,
+      usuarioId: docenteId || null
+    });
     res.json(asignatura);
   } catch (error) {
     res.status(500).json({ message: "Error al actualizar asignatura", error });

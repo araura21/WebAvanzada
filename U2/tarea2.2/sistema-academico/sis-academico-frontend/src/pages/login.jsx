@@ -67,6 +67,9 @@ const Login = ({
 
       if (resp.ok && token) {
         if (useLocalStorage) {
+          // Limpiar datos previos
+          localStorage.clear();
+
           localStorage.setItem(tokenStorageKey, token);
           // Guardar información adicional del usuario si está disponible
           if (data.usuario) {

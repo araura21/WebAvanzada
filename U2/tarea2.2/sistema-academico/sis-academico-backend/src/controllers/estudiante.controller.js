@@ -1,5 +1,6 @@
 // src/controllers/estudiante.controller.js
 import Estudiante from "../models/estudiante.model.js";
+import Usuario from "../models/auth.model.js";
 import { Op } from "sequelize";
 
 export const obtenerEstudiantes = async (req, res) => {
@@ -16,7 +17,8 @@ export const obtenerEstudiantes = async (req, res) => {
 export const getEstudianteByUsuario = async (req, res) => {
   const { usuario } = req.params;
   try {
-    const estudiante = await Estudiante.findOne({
+    // 1. Intentar buscar por correo o cÃ©dula (directo en Estudiante)
+    let estudiante = await Estudiante.findOne({
       where: {
         [Op.or]: [
           { correo: usuario },
@@ -26,12 +28,25 @@ export const getEstudianteByUsuario = async (req, res) => {
       }
     });
 
+    // 2. Si no encuentra, buscar por el nombre de usuario (relaciÃ³n Usuario)
+    if (!estudiante) {
+      estudiante = await Estudiante.findOne({
+        include: [{
+          model: Usuario,
+          as: 'usuario',
+          where: { usuario: usuario }
+        }],
+        where: { estado: 'activo' }
+      });
+    }
+
     if (!estudiante) {
       return res.status(404).json({ mensaje: "Estudiante no encontrado para este usuario" });
     }
 
     res.json(estudiante);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ mensaje: "Error al buscar perfil", error });
   }
 };

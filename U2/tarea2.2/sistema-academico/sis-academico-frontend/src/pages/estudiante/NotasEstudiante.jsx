@@ -89,72 +89,64 @@ const NotasEstudiante = () => {
                         <thead className="bg-light">
                             <tr>
                                 <th>Asignatura</th>
-                                <th className="text-center">Parcial 1 (14 pts)</th>
-                                <th className="text-center">Parcial 2 (14 pts)</th>
-                                <th className="text-center">Parcial 3 (14 pts)</th>
-                                <th className="text-center">Total (42 pts)</th>
+                                <th className="text-center">Parcial 1 (20 pts)</th>
+                                <th className="text-center">Parcial 2 (20 pts)</th>
+                                <th className="text-center">Parcial 3 (20 pts)</th>
+                                <th className="text-center">Total (60 pts)</th>
                                 <th className="text-center">Estado</th>
                             </tr>
                         </thead>
                         <tbody>
                             {Object.entries(notasPorAsignatura).map(([materia, parials]) => {
-                                const p1 = calcularParcial(parials.P1);
-                                const p2 = calcularParcial(parials.P2);
-                                const p3 = calcularParcial(parials.P3);
+                                const p1 = parials.P1 ? parials.P1.total_parcial : 0;
+                                const p2 = parials.P2 ? parials.P2.total_parcial : 0;
+                                const p3 = parials.P3 ? parials.P3.total_parcial : 0;
 
-                                const totalSemestre = (parseFloat(p1.sobre14) + parseFloat(p2.sobre14) + parseFloat(p3.sobre14)).toFixed(2);
+                                const totalSemestre = (parseFloat(p1) + parseFloat(p2) + parseFloat(p3)).toFixed(2);
 
                                 let estado = "En Curso";
                                 let badgeVariant = "primary";
 
-                                // Lógica de aprobación (Simplificada según requerimientos)
-                                // "Si saca menos de 28 puntos en P1 + P2 -> pierde en segundo parcial"
-                                const sumaP1P2 = parseFloat(p1.sobre14) + parseFloat(p2.sobre14);
+                                const sumaP1P2 = parseFloat(p1) + parseFloat(p2);
 
+                                // Lógica de aprobación actualizada
                                 if (parials.P1 && parials.P2) {
-                                    if (sumaP1P2 < 28) { // Esto es ALTISIMO, 28 es el maximo posible (14+14). 
-                                        // Asumo que el user quizo decir sobre 20 o sobre 40? 
-                                        // El user dijo: "Si saca menos de 28 puntos en la suma del Parcial 1 + Parcial 2"
-                                        // PERO "Cada parcial vale 14". 14+14=28.
-                                        // Si saca MENOS de 28 significa que tiene que sacar PERFECTO para no perder?
-                                        // ASUMIRE que 28 se refiere a la nota sobre 40 (20+20)? 
-                                        // O tal vez 28 es el MINIMO para aprobar sin P3?
-                                        // Voy a mostrar el estado basado en si completó los 3.
-
-                                        // Si la suma es baja (ej. menos del 50% = 14)
-                                        // Pondremos logica estandar: < 28 (sobre 40?? no, sobre 14+14=28)
-                                        // Si el user insiste en 28, pondré la alerta visual.
-                                    }
-                                }
-
-                                if (parials.P3) {
-                                    // Final logic
-                                    // Promedio 42.10? 
-                                    if (totalSemestre >= 28) { // Asumiendo 28/42 es apruebo (66%)
-                                        estado = "Aprobado";
-                                        badgeVariant = "success";
-                                    } else {
-                                        estado = "Reprobado";
+                                    // Regla: Si suma de P1 y P2 es menor a 28, reprueba el semestre
+                                    if (sumaP1P2 < 28) {
+                                        estado = "Reprobado (P1+P2 < 28)";
                                         badgeVariant = "danger";
                                     }
-                                } else if (parials.P2 && sumaP1P2 < 14) { // Asumiendo mitad
-                                    estado = "Rizgo de Reprobación";
-                                    badgeVariant = "warning";
+                                    // Si tiene los 3 parciales
+                                    else if (parials.P3) {
+                                        // Regla: Suma total debe ser >= 42
+                                        if (totalSemestre >= 42) {
+                                            estado = "Aprobado";
+                                            badgeVariant = "success";
+                                        } else {
+                                            estado = "Reprobado";
+                                            badgeVariant = "danger";
+                                        }
+                                    }
+                                    // Si tiene P1 y P2 >= 28 pero falta P3
+                                    else {
+                                        estado = "Pendiente Parcial 3";
+                                        badgeVariant = "warning";
+                                    }
                                 }
 
                                 return (
                                     <tr key={materia}>
                                         <td className="fw-bold">{materia}</td>
                                         <td className="text-center">
-                                            {parials.P1 ? <span title={`Sobre 20: ${p1.sobre20}`}>{p1.sobre14}</span> : '-'}
+                                            {parials.P1 ? parials.P1.total_parcial : '-'}
                                         </td>
                                         <td className="text-center">
-                                            {parials.P2 ? <span title={`Sobre 20: ${p2.sobre20}`}>{p2.sobre14}</span> : '-'}
+                                            {parials.P2 ? parials.P2.total_parcial : '-'}
                                         </td>
                                         <td className="text-center">
-                                            {parials.P3 ? <span title={`Sobre 20: ${p3.sobre20}`}>{p3.sobre14}</span> : '-'}
+                                            {parials.P3 ? parials.P3.total_parcial : '-'}
                                         </td>
-                                        <td className="text-center fw-bold">{totalSemestre}</td>
+                                        <td className="text-center fw-bold">{totalSemestre} / 60</td>
                                         <td className="text-center">
                                             <Badge bg={badgeVariant}>{estado}</Badge>
                                         </td>
@@ -171,7 +163,7 @@ const NotasEstudiante = () => {
                 </Card.Body>
             </Card>
             <div className="mt-3 text-muted small">
-                * Las notas parciales se muestran ponderadas sobre 14 puntos. Pase el mouse sobre la nota para ver la calificación sobre 20.
+                * Para aprobar el semestre se requiere un m&iacute;nimo de 42/60 puntos. Si la suma del Parcial 1 y 2 es menor a 28, se reprueba autom&aacute;ticamente.
             </div>
         </div>
     );

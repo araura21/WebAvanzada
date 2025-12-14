@@ -130,9 +130,9 @@ const GestionUsuarios = () => {
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>Gestión de Usuarios</h2>
-                <Button onClick={() => setShowModal(true)}>
+                {/*<Button onClick={() => setShowModal(true)}>
                     <i className="bi bi-person-plus mr-2"></i> Nuevo Usuario
-                </Button>
+                </Button>*/}
             </div>
 
             {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}

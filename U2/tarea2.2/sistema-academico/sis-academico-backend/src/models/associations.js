@@ -7,9 +7,16 @@ import Nota from "./nota.model.js";
 
 export const setupAssociations = () => {
     // Docente (Usuario) - Asignatura (1:N)
-    // Usamos Usuario en lugar de Docente porque la tabla docentes está vacía actualmente
     Usuario.hasMany(Asignatura, { foreignKey: "usuarioId", as: "asignaturas" });
     Asignatura.belongsTo(Usuario, { foreignKey: "usuarioId", as: "docente" });
+
+    // Usuario - Estudiante (1:1)
+    Usuario.hasOne(Estudiante, { foreignKey: "usuarioId", as: "estudianteProfile" });
+    Estudiante.belongsTo(Usuario, { foreignKey: "usuarioId", as: "usuario" });
+
+    // Usuario - Docente (1:1)
+    Usuario.hasOne(Docente, { foreignKey: "usuarioId", as: "docenteProfile" });
+    Docente.belongsTo(Usuario, { foreignKey: "usuarioId", as: "usuario" });
 
     // Matricula Relaciones (M:N Estudiante-Asignatura)
     // Ya definidos en matricula.model.js pero se pueden reforzar aquí si es necesario

@@ -51,6 +51,15 @@ const Docente = sequelize.define("Docente", {
     defaultValue: "activo",
   },
 
+  usuarioId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: "usuarios",
+      key: "id",
+    },
+  },
+
 }, {
   tableName: "docentes",
   timestamps: true,

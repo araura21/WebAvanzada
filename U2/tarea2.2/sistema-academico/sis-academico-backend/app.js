@@ -8,6 +8,7 @@ import notaRoutes from "./src/routes/nota.routes.js";
 import asignaturaRoutes from "./src/routes/asignatura.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
 import matriculaRoutes from "./src/routes/matricula.routes.js";
+import adminRoutes from "./src/routes/admin.routes.js";
 import { setupAssociations } from "./src/models/associations.js";
 
 // Init associations
@@ -25,6 +26,7 @@ app.use(cors({
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use('/uploads', express.static('public/uploads'));
 
 
 app.use("/api/auth", authRoutes);
@@ -34,13 +36,15 @@ app.use("/api/docentes", docenteRoutes);
 app.use("/api/notas", notaRoutes);
 app.use("/api/asignaturas", asignaturaRoutes);
 app.use("/api/matriculas", matriculaRoutes);
+app.use("/api/admin", adminRoutes);
 
 (async () => {
   try {
     await sequelize.authenticate();
     console.log("Conexion establecida con MySQL");
 
-    await sequelize.sync({ alter: true });
+    // await sequelize.sync({ alter: true });
+    await sequelize.sync({ force: false });
     console.log("Modelos sincronizados (alter mode)");
 
     app.listen(3000, () => {

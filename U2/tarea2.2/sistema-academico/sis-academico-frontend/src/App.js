@@ -22,9 +22,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    localStorage.removeItem('rol');
+    localStorage.clear();
     setIsAuthenticated(false);
   };
 

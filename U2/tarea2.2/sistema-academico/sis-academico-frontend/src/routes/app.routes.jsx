@@ -1,8 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from '../pages/dashboard';
-import Estudiantes from '../pages/estudiantes';
-import Docentes from '../pages/docentes';
 import NotasPage from '../pages/notas';
 import NotaForm from '../components/notas/nota.form';
 import Login from '../pages/login';
@@ -13,17 +11,21 @@ import Sidebar from '../components/layout/sidebar';
 // Admin Pages
 import GestionUsuarios from '../pages/admin/GestionUsuarios';
 import GestionAsignaturas from '../pages/admin/GestionAsignaturas';
+import GestionEstudiantesAdmin from '../pages/admin/GestionEstudiantes';
+import GestionDocentesAdmin from '../pages/admin/GestionDocentes';
+import GestionMatriculasAdmin from '../pages/admin/GestionMatriculas';
 
 // Estudiante Pages
 import DashboardEstudiante from '../pages/estudiante/DashboardEstudiante';
 import NotasEstudiante from '../pages/estudiante/NotasEstudiante';
 import PerfilEstudiante from '../pages/estudiante/PerfilEstudiante';
+import MisCompaneros from '../pages/estudiante/MisCompaneros';
 
 // Docente Pages
 import DashboardDocente from '../pages/docente/DashboardDocente';
-import GestionEstudiantes from '../pages/docente/GestionEstudiantes';
+import MisClases from '../pages/docente/MisClases';
 import GestionNotas from '../pages/docente/GestionNotas';
-import GestionMatriculas from '../pages/docente/GestionMatriculas';
+import ResumenNotasDocente from '../pages/docente/ResumenNotasDocente';
 
 const DefaultRedirect = () => {
     const rol = localStorage.getItem('rol');
@@ -61,8 +63,9 @@ const AppRoutes = ({ isAuthenticated, onLogout }) => {
 
                         {/* Admin Routes */}
                         <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><Dashboard /></ProtectedRoute>} />
-                        <Route path="/estudiantes" element={<ProtectedRoute allowedRoles={['admin']}><Estudiantes /></ProtectedRoute>} />
-                        <Route path="/docentes" element={<ProtectedRoute allowedRoles={['admin']}><Docentes /></ProtectedRoute>} />
+                        <Route path="/admin/estudiantes" element={<ProtectedRoute allowedRoles={['admin']}><GestionEstudiantesAdmin /></ProtectedRoute>} />
+                        <Route path="/admin/docentes" element={<ProtectedRoute allowedRoles={['admin']}><GestionDocentesAdmin /></ProtectedRoute>} />
+                        <Route path="/admin/matriculas" element={<ProtectedRoute allowedRoles={['admin']}><GestionMatriculasAdmin /></ProtectedRoute>} />
                         <Route path="/notas" element={<ProtectedRoute allowedRoles={['admin']}><NotasPage /></ProtectedRoute>} />
                         <Route path="/notas/crear" element={<ProtectedRoute allowedRoles={['admin']}><NotaForm /></ProtectedRoute>} />
                         <Route path="/notas/editar/:id" element={<ProtectedRoute allowedRoles={['admin']}><NotaForm /></ProtectedRoute>} />
@@ -73,12 +76,13 @@ const AppRoutes = ({ isAuthenticated, onLogout }) => {
                         <Route path="/estudiante/dashboard" element={<ProtectedRoute allowedRoles={['estudiante']}><DashboardEstudiante /></ProtectedRoute>} />
                         <Route path="/estudiante/notas" element={<ProtectedRoute allowedRoles={['estudiante']}><NotasEstudiante /></ProtectedRoute>} />
                         <Route path="/estudiante/perfil" element={<ProtectedRoute allowedRoles={['estudiante']}><PerfilEstudiante /></ProtectedRoute>} />
+                        <Route path="/estudiante/companeros" element={<ProtectedRoute allowedRoles={['estudiante']}><MisCompaneros /></ProtectedRoute>} />
 
                         {/* Docente Routes */}
                         <Route path="/docente/dashboard" element={<ProtectedRoute allowedRoles={['docente']}><DashboardDocente /></ProtectedRoute>} />
-                        <Route path="/docente/estudiantes" element={<ProtectedRoute allowedRoles={['docente']}><GestionEstudiantes /></ProtectedRoute>} />
-                        <Route path="/docente/notas" element={<ProtectedRoute allowedRoles={['docente']}><GestionNotas /></ProtectedRoute>} />
-                        <Route path="/docente/matriculas" element={<ProtectedRoute allowedRoles={['docente']}><GestionMatriculas /></ProtectedRoute>} />
+                        <Route path="/docente/clases" element={<ProtectedRoute allowedRoles={['docente']}><MisClases /></ProtectedRoute>} />
+                        <Route path="/docente/notas/:id" element={<ProtectedRoute allowedRoles={['docente']}><GestionNotas /></ProtectedRoute>} />
+                        <Route path="/docente/resumen" element={<ProtectedRoute allowedRoles={['docente']}><ResumenNotasDocente /></ProtectedRoute>} />
 
                         <Route path="/ayuda" element={<Ayuda />} />
                         <Route path="*" element={<DefaultRedirect />} />

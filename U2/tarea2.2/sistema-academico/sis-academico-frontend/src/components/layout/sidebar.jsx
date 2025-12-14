@@ -25,12 +25,27 @@ const Sidebar = () => {
               </li>
               <li>
                 <Link to="/admin/usuarios" className={isActive('/admin/usuarios')}>
-                  <i className="bi bi-people"></i> Usuarios
+                  <i className="bi bi-people-fill"></i> Usuarios
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/estudiantes" className={isActive('/admin/estudiantes')}>
+                  <i className="bi bi-person-badge"></i> Estudiantes
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/docentes" className={isActive('/admin/docentes')}>
+                  <i className="bi bi-person-video3"></i> Docentes
                 </Link>
               </li>
               <li>
                 <Link to="/admin/asignaturas" className={isActive('/admin/asignaturas')}>
                   <i className="bi bi-book"></i> Asignaturas
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/matriculas" className={isActive('/admin/matriculas')}>
+                  <i className="bi bi-card-checklist"></i> Matrículas
                 </Link>
               </li>
               <li>
@@ -44,23 +59,13 @@ const Sidebar = () => {
           {rol === 'docente' && (
             <>
               <li>
-                <Link to="/docente/dashboard" className={isActive('/docente/dashboard')}>
-                  <i className="bi bi-house-door"></i> Inicio
+                <Link to="/docente/clases" className={isActive('/docente/clases')}>
+                  <i className="bi bi-journal-check"></i> Mis Clases / Calificar
                 </Link>
               </li>
               <li>
-                <Link to="/docente/estudiantes" className={isActive('/docente/estudiantes')}>
-                  <i className="bi bi-people"></i> Mis Estudiantes
-                </Link>
-              </li>
-              <li>
-                <Link to="/docente/notas" className={isActive('/docente/notas')}>
-                  <i className="bi bi-journal-text"></i> Notas
-                </Link>
-              </li>
-              <li>
-                <Link to="/docente/matriculas" className={isActive('/docente/matriculas')}>
-                  <i className="bi bi-pencil-square"></i> Matricular
+                <Link to="/docente/resumen" className={isActive('/docente/resumen')}>
+                  <i className="bi bi-table"></i> Resumen de Notas
                 </Link>
               </li>
             </>
@@ -78,11 +83,11 @@ const Sidebar = () => {
                   <i className="bi bi-bar-chart"></i> Mis Notas
                 </Link>
               </li>
-              <li>
-                <Link to="/estudiante/perfil" className={isActive('/estudiante/perfil')}>
-                  <i className="bi bi-person-badge"></i> Mi Perfil
+              {/* <li>
+                <Link to="/estudiante/companeros" className={isActive('/estudiante/companeros')}>
+                  <i className="bi bi-people"></i> Mis Compañeros
                 </Link>
-              </li>
+              </li> */}
             </>
           )}
         </ul>
