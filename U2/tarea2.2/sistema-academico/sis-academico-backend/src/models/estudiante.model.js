@@ -35,7 +35,22 @@ const Estudiante = sequelize.define("Estudiante", {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  
+
+  foto: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
+
+  estado: {
+    type: DataTypes.ENUM("activo", "inactivo"),
+    defaultValue: "activo",
+  },
+
+  curso: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+
   foto: {
     type: DataTypes.STRING(255),
     allowNull: true,

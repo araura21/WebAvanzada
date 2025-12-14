@@ -58,7 +58,7 @@ export const buscarEstudiante = async (req, res) => {
 
 export const crearEstudiante = async (req, res) => {
   try {
-    const { cedula, nombres, apellidos, correo, telefono, curso, paralelo } = req.body;
+    const { cedula, nombres, apellidos, correo, telefono, curso } = req.body;
 
     // Validaciones
     if (!cedula || !nombres || !apellidos || !correo) {
@@ -74,7 +74,6 @@ export const crearEstudiante = async (req, res) => {
       correo: correo.trim().toLowerCase(),
       telefono: telefono || null,
       curso: curso || null,
-      paralelo: paralelo || null,
       estado: "activo"
     };
 

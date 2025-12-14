@@ -8,7 +8,7 @@ const GestionEstudiantes = () => {
     const [editing, setEditing] = useState(false);
     const [currentId, setCurrentId] = useState(null);
     const [formData, setFormData] = useState({
-        cedula: '', nombres: '', apellidos: '', correo: '', telefono: '', curso: '', paralelo: ''
+        cedula: '', nombres: '', apellidos: '', correo: '', telefono: '', curso: ''
     });
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -125,7 +125,7 @@ const GestionEstudiantes = () => {
     };
 
     const resetForm = () => {
-        setFormData({ cedula: '', nombres: '', apellidos: '', correo: '', telefono: '', curso: '', paralelo: '' });
+        setFormData({ cedula: '', nombres: '', apellidos: '', correo: '', telefono: '', curso: '' });
         setFile(null);
         setEditing(false);
         setCurrentId(null);
@@ -138,8 +138,7 @@ const GestionEstudiantes = () => {
             apellidos: est.apellidos,
             correo: est.correo,
             telefono: est.telefono || '',
-            curso: est.curso || '',
-            paralelo: est.paralelo || ''
+            curso: est.curso || ''
         });
         setCurrentId(est.id);
         setEditing(true);
@@ -165,7 +164,6 @@ const GestionEstudiantes = () => {
                         <th>Nombres</th>
                         <th>Apellidos</th>
                         <th>Curso</th>
-                        <th>Paralelo</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -176,7 +174,6 @@ const GestionEstudiantes = () => {
                             <td>{est.nombres}</td>
                             <td>{est.apellidos}</td>
                             <td>{est.curso || '-'}</td>
-                            <td>{est.paralelo || '-'}</td>
                             <td>
                                 <Button variant="info" size="sm" className="me-2" onClick={() => handleEdit(est)}>
                                     <i className="bi bi-pencil"></i>
@@ -216,25 +213,10 @@ const GestionEstudiantes = () => {
                             <Form.Label>Teléfono</Form.Label>
                             <Form.Control type="text" name="telefono" value={formData.telefono} onChange={handleChange} />
                         </Form.Group>
-                        <div className="row">
-                            <div className="col-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Curso</Form.Label>
-                                    <Form.Control type="text" name="curso" value={formData.curso} onChange={handleChange} />
-                                </Form.Group>
-                            </div>
-                            <div className="col-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Paralelo</Form.Label>
-                                    <Form.Select name="paralelo" value={formData.paralelo} onChange={handleChange}>
-                                        <option value="">Seleccione...</option>
-                                        <option value="A">A</option>
-                                        <option value="B">B</option>
-                                        <option value="C">C</option>
-                                    </Form.Select>
-                                </Form.Group>
-                            </div>
-                        </div>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Curso</Form.Label>
+                            <Form.Control type="text" name="curso" value={formData.curso} onChange={handleChange} />
+                        </Form.Group>
 
                         {!editing && (
                             <Form.Group className="mb-3">
