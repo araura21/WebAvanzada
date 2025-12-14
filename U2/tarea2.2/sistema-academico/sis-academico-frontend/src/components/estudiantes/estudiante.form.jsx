@@ -77,7 +77,7 @@ const EstudianteForm = () => {
 
       <div className="mb-3">
         <label>Cédula</label>
-        <input type="text" name="cedula" className="form-control"
+        <input type="text" name="cedula" className="form-control" maxLength={10}
           onChange={handleChange} />
       </div>
 
@@ -101,7 +101,7 @@ const EstudianteForm = () => {
 
       <div className="mb-3">
         <label>Teléfono</label>
-        <input type="text" name="telefono" className="form-control"
+        <input type="text" name="telefono" className="form-control" maxLength={10}
           onChange={handleChange} />
       </div>
 

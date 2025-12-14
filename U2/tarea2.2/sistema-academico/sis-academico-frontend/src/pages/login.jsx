@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { validarTexto } from '../utils/validations';
 
 /**
  * Componente Login2 reutilizable
@@ -30,6 +31,16 @@ const Login = ({
   const handleLogin = async () => {
     if (!username || !password) {
       const errorMsg = 'Por favor ingresa usuario y contraseña';
+      if (onLoginError) {
+        onLoginError(errorMsg);
+      } else {
+        alert(errorMsg);
+      }
+      return;
+    }
+
+    if (!validarTexto(username)) {
+      const errorMsg = 'El usuario contiene caracteres no permitidos';
       if (onLoginError) {
         onLoginError(errorMsg);
       } else {
@@ -113,7 +124,7 @@ const Login = ({
                 Username
               </label>
               <span className="p-input-icon-right block">
-                <i className="pi pi-user"></i>
+                <i className="bi bi-person"></i>
                 <input
                   id="username"
                   type="text"
@@ -130,7 +141,7 @@ const Login = ({
                 Password
               </label>
               <span className="p-input-icon-right block">
-                <i className="pi pi-lock"></i>
+                <i className="bi bi-lock"></i>
                 <input
                   id="password"
                   type="password"

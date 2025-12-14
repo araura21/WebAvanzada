@@ -6,6 +6,7 @@ import authRoutes from "./src/routes/auth.routes.js";
 import docenteRoutes from "./src/routes/docente.routes.js";
 import notaRoutes from "./src/routes/nota.routes.js";
 import asignaturaRoutes from "./src/routes/asignatura.routes.js";
+import userRoutes from "./src/routes/user.routes.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/estudiantes", estudianteRoutes);
 app.use("/api/docentes", docenteRoutes);
 app.use("/api/notas", notaRoutes);

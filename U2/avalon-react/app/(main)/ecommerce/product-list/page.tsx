@@ -1,34 +1,39 @@
 'use client';
 import { Button } from 'primereact/button';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+interface Product {
+    name: string;
+    price: number;
+    description: string;
+    category: string;
+    imageUrl: string;
+}
 
 function ProductList() {
-    const [products] = useState([
-        {
-            price: '$140.00',
-            image: 'demo/images/ecommerce/product-list/product-list-4-1.png'
-        },
-        {
-            price: '$82.00',
-            image: 'demo/images/ecommerce/product-list/product-list-4-2.png'
-        },
-        {
-            price: '$54.00',
-            image: 'demo/images/ecommerce/product-list/product-list-4-3.png'
-        },
-        {
-            price: '$72.00',
-            image: 'demo/images/ecommerce/product-list/product-list-4-4.png'
-        },
-        {
-            price: '$99.00',
-            image: 'demo/images/ecommerce/product-list/product-list-4-5.png'
-        },
-        {
-            price: '$89.00',
-            image: 'demo/images/ecommerce/product-list/product-list-4-6.png'
+
+    //1. 
+    const [products, setProducts] = useState<Product[]>([]);
+    // 2. usar useEffect para cargar la api
+    useEffect(()=>{
+        const loadProducts = async()=>{
+            //llamar a la api publica dummyjson
+            const res = await fetch ("https://dummyjson.com/products");
+            const data = await res.json ();
+            //mapear los datos para mostrar por la interfaz
+            const mapped = data.products.map((p:any)=>({
+                name: p.title,
+                price: p.price,
+                description: p.description,
+                category: p.category,
+                imageUrl: p.thumbnail
+
+            }));
+            setProducts(mapped);
         }
-    ]);
+        loadProducts();
+    }, []);
+
 
     const [products2, setProducts2] = useState([
         {
@@ -67,17 +72,21 @@ function ProductList() {
                                 <div className="p-2">
                                     <div className="shadow-2 p-4 surface-card border-round">
                                         <div className="relative mb-3">
+                                                 {/* categoria viene del backend */}
                                             <span
+                                            
                                                 className="surface-card text-900 shadow-2 px-3 py-2 absolute"
                                                 style={{
                                                     borderRadius: '1.5rem',
                                                     left: '1rem',
                                                     top: '1rem'
                                                 }}
-                                            >
-                                                Category
+                                            >{product.category}                                           
                                             </span>
-                                            <img src={'/' + product.image} className="w-full" alt={i.toString()} />
+
+                                            {/*CARGAR LA IMAGEN DE LA API*/}
+
+                                            <img src={product.imageUrl} className="w-full" alt={product.name} />
                                         </div>
                                         <div className="flex justify-content-between align-items-center mb-3">
                                             <span className="text-900 font-medium text-xl">Product Name</span>
@@ -86,7 +95,7 @@ function ProductList() {
                                                 <span className="font-medium">5.0</span>
                                             </span>
                                         </div>
-                                        <p className="mt-0 mb-3 text-700 line-height-3">Enim nec dui nunc mattis enim ut tellus. Tincidunt arcu.</p>
+                                        <p className="mt-0 mb-3 text-700 line-height-3">{product.description}</p>
                                         <span className="text-primary text-xl font-medium">{product.price}</span>
                                     </div>
                                 </div>

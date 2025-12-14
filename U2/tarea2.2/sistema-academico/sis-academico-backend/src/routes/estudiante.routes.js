@@ -6,6 +6,7 @@ import {
   crearEstudiante,
   actualizarEstudiante,
   eliminarEstudiante,
+  getEstudianteByUsuario
 } from "../controllers/estudiante.controller.js";
 import { verificarToken } from "../middlewares/auth.middleware.js";
 import upload from "../config/multer.js";
@@ -14,6 +15,7 @@ const router = Router();
 
 // Rutas públicas (sin autenticación)
 router.get("/", obtenerEstudiantes);
+router.get("/perfil/:usuario", getEstudianteByUsuario);
 router.get("/buscar/:termino", buscarEstudiante);
 router.post(
   "/",

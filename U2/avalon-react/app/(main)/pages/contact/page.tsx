@@ -7,9 +7,14 @@ import { classNames } from 'primereact/utils';
 import { LayoutContext } from '../../../../layout/context/layoutcontext';
 
 function Contact() {
+
+
+    //cambios de estado
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
+
+    //panel - modificar agregar datos de contacto
     const [content] = useState([
         { icon: 'pi pi-fw pi-phone', title: 'Phone', info: '1 (833) 597-7538' },
         {
@@ -20,6 +25,29 @@ function Contact() {
         { icon: 'pi pi-fw pi-print', title: 'Fax', info: '3 (833) 297-1548' }
     ]);
     const { layoutConfig } = useContext(LayoutContext);
+    
+    const handleSend = () => {
+        if (!name || !email || !message) {
+            alert("Los campos son obligatorios");
+            return;
+        }
+        const newMessage = {
+            name,
+            email,
+            message,
+            date: new Date().toISOString()
+        };
+        
+        const saved = JSON.parse(localStorage.getItem("messages") || "[]");
+        saved.push(newMessage);
+        localStorage.setItem("messages", JSON.stringify(saved));
+        
+        alert("Mensaje enviado correctamente");
+        setName('');
+        setEmail('');
+        setMessage('');
+    };
+
     return (
         <div className="grid card grid-nogutter" style={{ columnGap: '2rem', rowGap: '2rem' }}>
             <div className="col-12">
@@ -73,7 +101,7 @@ function Contact() {
                             Message
                         </label>
                         <InputTextarea id="message" rows={5} cols={30} value={message} onChange={(event) => setMessage(event.target.value)} />
-                        <Button className="ml-auto mt-3 border-round" label="Send Message"></Button>
+                        <Button className="ml-auto mt-3 border-round" label="Send Message" onClick={handleSend}></Button>
                     </div>
                 </div>
             </div>

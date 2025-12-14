@@ -13,6 +13,29 @@ export const obtenerEstudiantes = async (req, res) => {
   }
 };
 
+export const getEstudianteByUsuario = async (req, res) => {
+  const { usuario } = req.params;
+  try {
+    const estudiante = await Estudiante.findOne({
+      where: {
+        [Op.or]: [
+          { correo: usuario },
+          { cedula: usuario }
+        ],
+        estado: 'activo'
+      }
+    });
+
+    if (!estudiante) {
+      return res.status(404).json({ mensaje: "Estudiante no encontrado para este usuario" });
+    }
+
+    res.json(estudiante);
+  } catch (error) {
+    res.status(500).json({ mensaje: "Error al buscar perfil", error });
+  }
+};
+
 export const buscarEstudiante = async (req, res) => {
   const { termino } = req.params;
 
@@ -23,7 +46,7 @@ export const buscarEstudiante = async (req, res) => {
           { cedula: { [Op.like]: `%${termino}%` } },
           { nombres: { [Op.like]: `%${termino}%` } },
           { apellidos: { [Op.like]: `%${termino}%` } }
-        ] 
+        ]
       }
     });
 
@@ -39,8 +62,8 @@ export const crearEstudiante = async (req, res) => {
 
     // Validaciones
     if (!cedula || !nombres || !apellidos || !correo) {
-      return res.status(400).json({ 
-        mensaje: "Campos requeridos: cedula, nombres, apellidos, correo" 
+      return res.status(400).json({
+        mensaje: "Campos requeridos: cedula, nombres, apellidos, correo"
       });
     }
 
@@ -62,26 +85,26 @@ export const crearEstudiante = async (req, res) => {
 
     // Crear el estudiante en la BD
     const nuevo = await Estudiante.create(data);
-    
-    res.status(201).json({ 
+
+    res.status(201).json({
       mensaje: "Estudiante registrado exitosamente",
       id: nuevo.id,
-      estudiante: nuevo 
+      estudiante: nuevo
     });
   } catch (error) {
     console.error("Error al crear estudiante:", error);
-    
+
     // Manejar errores específicos de validación
     if (error.name === "SequelizeUniqueConstraintError") {
       const campo = error.errors[0].path;
-      return res.status(400).json({ 
-        mensaje: `El ${campo} ya existe en la base de datos` 
+      return res.status(400).json({
+        mensaje: `El ${campo} ya existe en la base de datos`
       });
     }
 
-    res.status(500).json({ 
-      mensaje: "Error al crear estudiante", 
-      error: error.message 
+    res.status(500).json({
+      mensaje: "Error al crear estudiante",
+      error: error.message
     });
   }
 };
