@@ -1,7 +1,8 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import Estudiantes from './pages/estudiantes';
-import Login2 from './pages/login';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './routes/app.routes';
+import Login from './pages/login';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,7 +17,7 @@ function App() {
     setLoading(false);
   }, []);
 
-  const handleLoginSuccess = (data) => {
+  const handleLoginSuccess = () => {
     setIsAuthenticated(true);
   };
 
@@ -28,19 +29,17 @@ function App() {
   };
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <div className="text-center mt-5">Cargando...</div>;
   }
 
   return (
-    <div className="App">
+    <BrowserRouter>
       {isAuthenticated ? (
-        <div>
-          <Estudiantes onLogout={handleLogout} />
-        </div>
+        <AppRoutes isAuthenticated={true} onLogout={handleLogout} />
       ) : (
-        <Login2 onLoginSuccess={handleLoginSuccess} />
+        <Login onLoginSuccess={handleLoginSuccess} />
       )}
-    </div>
+    </BrowserRouter>
   );
 }
 

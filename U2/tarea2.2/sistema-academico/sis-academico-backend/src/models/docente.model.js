@@ -1,8 +1,8 @@
-// src/models/estudiante.model.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
+import {Asignatura} from "./asignatura.model.js";
 
-const Estudiante = sequelize.define("Estudiante", {
+const Docente = sequelize.define("Docente", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -16,38 +16,33 @@ const Estudiante = sequelize.define("Estudiante", {
   },
 
   nombres: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(64),
     allowNull: false,
   },
 
   apellidos: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(64),
     allowNull: false,
-  },
-
-  correo: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
   },
 
   telefono: {
     type: DataTypes.STRING,
     allowNull: true,
   },
+
+  correo: {
+    type: DataTypes.STRING(64),
+    allowNull: false,
+    unique: true,
+  },
+
+  especialidad:{
+    type: DataTypes.STRING(32),
+    allowNull: false,
+  },
   
   foto: {
     type: DataTypes.STRING(255),
-    allowNull: true,
-  },
-  
-  curso: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-
-  paralelo: {
-    type: DataTypes.STRING(1),
     allowNull: true,
   },
 
@@ -55,9 +50,14 @@ const Estudiante = sequelize.define("Estudiante", {
     type: DataTypes.ENUM("activo", "inactivo"),
     defaultValue: "activo",
   },
+
 }, {
-  tableName: "estudiantes",
+  tableName: "docentes",
   timestamps: true,
 });
 
-export default Estudiante;
+//Relaciones
+Docente.hasMany(Asignatura, {foreignKey: "docenteId", as: "asignaturas"});
+Asignatura.belongsTo(Docente, {foreignKey: "docenteId", as: "docente"});
+
+export default Docente;

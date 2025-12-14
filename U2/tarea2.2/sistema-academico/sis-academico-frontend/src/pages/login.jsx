@@ -12,7 +12,7 @@ import React, { useState } from 'react';
  * @param {string} config.tokenStorageKey - Clave para almacenar el token (default: token)
  * @param {boolean} config.useLocalStorage - Usar localStorage para guardar el token (default: true)
  */
-const Login2 = ({
+const Login = ({
   apiUrl = 'http://localhost:3000/api/auth/login',
   logoUrl = '/layout/images/pages/login/icon-login.svg',
   title = 'Sign in to Avalon',
@@ -222,4 +222,4 @@ const Login2 = ({
   );
 };
 
-export default Login2;
+export default Login;

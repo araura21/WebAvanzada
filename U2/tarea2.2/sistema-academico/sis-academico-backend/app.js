@@ -3,7 +3,9 @@ import cors from "cors";
 import sequelize from "./src/config/database.js";
 import estudianteRoutes from "./src/routes/estudiante.routes.js";
 import authRoutes from "./src/routes/auth.routes.js";
-import { crearUsuarioAdmin, crearUsuariosPrueba } from "./src/seeders/usuario.seeder.js";
+import docenteRoutes from "./src/routes/docente.routes.js";
+import notaRoutes from "./src/routes/nota.routes.js";
+import asignaturaRoutes from "./src/routes/asignatura.routes.js";
 
 const app = express();
 
@@ -15,13 +17,15 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 
 app.use("/api/auth", authRoutes);
-
 app.use("/api/estudiantes", estudianteRoutes);
+app.use("/api/docentes", docenteRoutes);
+app.use("/api/notas", notaRoutes);
+app.use("/api/asignaturas", asignaturaRoutes);
 
 (async () => {
   try {
@@ -30,10 +34,6 @@ app.use("/api/estudiantes", estudianteRoutes);
 
     await sequelize.sync({ alter: true });
     console.log("Modelos sincronizados (alter mode)");
-
-    // Crear usuarios de prueba
-    await crearUsuarioAdmin();
-    await crearUsuariosPrueba();
 
     app.listen(3000, () => {
       console.log("Servidor ejecutandose en http://localhost:3000");

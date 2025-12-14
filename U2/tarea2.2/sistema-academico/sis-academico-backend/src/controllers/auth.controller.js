@@ -5,7 +5,25 @@ import jwt from "jsonwebtoken";
 // REGISTRO (crear usuario)
 export const registrar = async (req, res) => {
   try {
-    const { usuario, password, rol } = req.body;
+    console.log("Body recibido:", req.body);
+    
+    const { usuario, password, rol } = req.body || {};
+
+    // Validar que los campos requeridos estén presentes
+    if (!usuario || !password || !rol) {
+      return res.status(400).json({ 
+        mensaje: "Usuario, contraseña y rol son requeridos",
+        recibido: { usuario: !!usuario, password: !!password, rol: !!rol }
+      });
+    }
+
+    // Validar que el rol sea válido
+    const rolesValidos = ["admin", "docente", "estudiante"];
+    if (!rolesValidos.includes(rol)) {
+      return res.status(400).json({ 
+        mensaje: "Rol inválido. Debe ser: admin, docente o estudiante"
+      });
+    }
 
     const existe = await Usuario.findOne({ where: { usuario } });
 
@@ -24,7 +42,12 @@ export const registrar = async (req, res) => {
 
     res.status(201).json({ mensaje: "Usuario creado", usuario: nuevo });
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al registrar", error });
+    console.error("Error al registrar usuario:", error);
+    res.status(500).json({ 
+      mensaje: "Error al registrar", 
+      detalles: error.message,
+      error: process.env.NODE_ENV === 'development' ? error : undefined
+    });
   }
 };
 

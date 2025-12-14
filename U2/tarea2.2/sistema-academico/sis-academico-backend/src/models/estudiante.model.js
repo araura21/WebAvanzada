@@ -40,16 +40,12 @@ const Estudiante = sequelize.define("Estudiante", {
     type: DataTypes.STRING(255),
     allowNull: true,
   },
-//curso de matematicas
-  curso: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
 
   estado: {
     type: DataTypes.ENUM("activo", "inactivo"),
     defaultValue: "activo",
   },
+
 }, {
   tableName: "estudiantes",
   timestamps: true,
