@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Badge, Alert } from 'react-bootstrap';
+import { Card, Table, Badge, Alert, Button } from 'react-bootstrap';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 const NotasEstudiante = () => {
     const [notas, setNotas] = useState([]);
@@ -65,6 +68,94 @@ const NotasEstudiante = () => {
         };
     };
 
+    const exportarPDF = () => {
+        const doc = new jsPDF();
+
+        doc.setFontSize(18);
+        doc.text("Reporte de Calificaciones", 14, 22);
+
+        doc.setFontSize(12);
+        doc.text(`Estudiante: ${usuario || 'N/A'}`, 14, 32);
+        doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 40);
+
+        const tableColumn = ["Asignatura", "Parcial 1", "Parcial 2", "Parcial 3", "Total", "Estado"];
+        const tableRows = [];
+
+        Object.entries(notasPorAsignatura).forEach(([materia, parials]) => {
+            const p1 = parials.P1 ? parials.P1.total_parcial : 0;
+            const p2 = parials.P2 ? parials.P2.total_parcial : 0;
+            const p3 = parials.P3 ? parials.P3.total_parcial : 0;
+            const totalSemestre = (parseFloat(p1) + parseFloat(p2) + parseFloat(p3)).toFixed(2);
+
+            let estado = "En Curso";
+            const sumaP1P2 = parseFloat(p1) + parseFloat(p2);
+
+            if (parials.P1 && parials.P2) {
+                if (sumaP1P2 < 28) {
+                    estado = "Reprobado";
+                } else if (parials.P3) {
+                    if (totalSemestre >= 42) estado = "Aprobado";
+                    else estado = "Reprobado";
+                } else {
+                    estado = "Pendiente Parcial 3";
+                }
+            }
+
+            tableRows.push([
+                materia,
+                p1 !== 0 ? p1 : '-',
+                p2 !== 0 ? p2 : '-',
+                p3 !== 0 ? p3 : '-',
+                `${totalSemestre} / 60`,
+                estado
+            ]);
+        });
+
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 50,
+        });
+
+        doc.save("Reporte_Notas.pdf");
+    };
+
+    const exportarExcel = () => {
+        const dataToExport = Object.entries(notasPorAsignatura).map(([materia, parials]) => {
+            const p1 = parials.P1 ? parseFloat(parials.P1.total_parcial) : 0;
+            const p2 = parials.P2 ? parseFloat(parials.P2.total_parcial) : 0;
+            const p3 = parials.P3 ? parseFloat(parials.P3.total_parcial) : 0;
+            const totalSemestre = (p1 + p2 + p3).toFixed(2);
+
+            let estado = "En Curso";
+            const sumaP1P2 = p1 + p2;
+
+            if (parials.P1 && parials.P2) {
+                if (sumaP1P2 < 28) estado = "Reprobado";
+                else if (parials.P3) {
+                    if (totalSemestre >= 42) estado = "Aprobado";
+                    else estado = "Reprobado";
+                } else {
+                    estado = "Pendiente Parcial 3";
+                }
+            }
+
+            return {
+                "Asignatura": materia,
+                "Parcial 1": p1 || '-',
+                "Parcial 2": p2 || '-',
+                "Parcial 3": p3 || '-',
+                "Total Semestre": totalSemestre,
+                "Estado": estado
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Notas");
+        XLSX.writeFile(workbook, "Reporte_Notas.xlsx");
+    };
+
     // Agrupar por asignatura
     const notasPorAsignatura = {};
     notas.forEach(nota => {
@@ -82,7 +173,17 @@ const NotasEstudiante = () => {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4">Mis Calificaciones</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2>Mis Calificaciones</h2>
+                <div>
+                    <Button variant="danger" className="me-2" onClick={exportarPDF}>
+                        <i className="bi bi-file-pdf me-2"></i>PDF
+                    </Button>
+                    <Button variant="success" onClick={exportarExcel}>
+                        <i className="bi bi-file-excel me-2"></i>Excel
+                    </Button>
+                </div>
+            </div>
             <Card className="shadow-sm">
                 <Card.Body>
                     <Table responsive striped bordered hover>

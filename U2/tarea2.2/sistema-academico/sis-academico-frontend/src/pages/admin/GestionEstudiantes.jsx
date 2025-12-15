@@ -15,7 +15,6 @@ const GestionEstudiantes = () => {
         correo: '',
         telefono: '',
         curso: '',
-        paralelo: '',
         foto: null
     });
 
@@ -59,7 +58,6 @@ const GestionEstudiantes = () => {
             data.append('correo', formData.correo);
             data.append('telefono', formData.telefono);
             data.append('curso', formData.curso);
-            data.append('paralelo', formData.paralelo);
             if (formData.foto) {
                 data.append('foto', formData.foto);
             }
@@ -169,13 +167,9 @@ const GestionEstudiantes = () => {
                         </div>
 
                         <div className="row mb-3">
-                            <div className="col-md-6">
+                            <div className="col-md-12">
                                 <Form.Label>Curso</Form.Label>
                                 <Form.Control name="curso" value={formData.curso} onChange={handleChange} placeholder="Ej. 6to Semestre" required />
-                            </div>
-                            <div className="col-md-6">
-                                <Form.Label>Paralelo</Form.Label>
-                                <Form.Control name="paralelo" value={formData.paralelo} onChange={handleChange} placeholder="Ej. A" required />
                             </div>
                         </div>
 
