@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Alert } from 'react-bootstrap';
+import { validarCedula, validarEmail, validarPassword, validarTexto } from '../../utils/validations';
 
 const GestionEstudiantes = () => {
     const [estudiantes, setEstudiantes] = useState([]);
@@ -46,6 +47,21 @@ const GestionEstudiantes = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
+
+        // Validaciones
+        if (!validarCedula(formData.cedula)) {
+            return setError("Cédula inválida. Verifique que sea una cédula ecuatoriana real.");
+        }
+        if (!validarEmail(formData.correo)) {
+            return setError("Formato de correo inválido.");
+        }
+        if (!validarPassword(formData.password)) {
+            return setError("La contraseña debe tener al menos 6 caracteres.");
+        }
+        if (!validarTexto(formData.nombres) || !validarTexto(formData.apellidos)) {
+            return setError("Nombres o apellidos contienen caracteres no permitidos.");
+        }
+
         try {
             const token = localStorage.getItem('token');
 
@@ -144,7 +160,7 @@ const GestionEstudiantes = () => {
                         <div className="row mb-3">
                             <div className="col-md-6">
                                 <Form.Label>Cédula</Form.Label>
-                                <Form.Control name="cedula" value={formData.cedula} onChange={handleChange} required />
+                                <Form.Control name="cedula" value={formData.cedula} onChange={handleChange} maxLength={10} required />
                             </div>
                             <div className="col-md-6">
                                 <Form.Label>Correo</Form.Label>
@@ -163,7 +179,7 @@ const GestionEstudiantes = () => {
                         </div>
                         <div className="mb-3">
                             <Form.Label>Teléfono</Form.Label>
-                            <Form.Control name="telefono" value={formData.telefono} onChange={handleChange} />
+                            <Form.Control name="telefono" value={formData.telefono} onChange={handleChange} maxLength={10} required />
                         </div>
 
                         <div className="row mb-3">
