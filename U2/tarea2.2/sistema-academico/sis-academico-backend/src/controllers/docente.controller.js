@@ -1,4 +1,6 @@
 import Docente from "../models/docente.model.js";
+import Usuario from "../models/auth.model.js";
+import { Op } from "sequelize";
 
 // Listar todos los docentes activos
 export const getDocentes = async (req, res) => {
@@ -9,6 +11,43 @@ export const getDocentes = async (req, res) => {
     res.json(docentes);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener docentes", error });
+  }
+};
+
+export const getDocenteByUsuario = async (req, res) => {
+  const { usuario } = req.params;
+  try {
+    // 1. Intentar buscar por correo o cedula (directo en Docente)
+    let docente = await Docente.findOne({
+      where: {
+        [Op.or]: [
+          { correo: usuario },
+          { cedula: usuario }
+        ],
+        estado: 'activo'
+      }
+    });
+
+    // 2. Si no encuentra, buscar por el nombre de usuario (relación Usuario)
+    if (!docente) {
+      docente = await Docente.findOne({
+        include: [{
+          model: Usuario,
+          as: 'usuario',
+          where: { usuario: usuario }
+        }],
+        where: { estado: 'activo' }
+      });
+    }
+
+    if (!docente) {
+      return res.status(404).json({ message: "Docente no encontrado para este usuario" });
+    }
+
+    res.json(docente);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al buscar perfil", error });
   }
 };
 
@@ -28,7 +67,7 @@ export const getDocenteById = async (req, res) => {
 export const createDocente = async (req, res) => {
   try {
     const { cedula, nombres, apellidos, correo, especialidad, telefono } = req.body;
-    
+
     // Verificar si ya existe
     const existe = await Docente.findOne({ where: { cedula } });
     if (existe) return res.status(400).json({ message: "La cédula ya está registrada" });
@@ -48,7 +87,7 @@ export const updateDocente = async (req, res) => {
   try {
     const { id } = req.params;
     const docente = await Docente.findByPk(id);
-    
+
     if (!docente) return res.status(404).json({ message: "Docente no encontrado" });
 
     await docente.update(req.body);

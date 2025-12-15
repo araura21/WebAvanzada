@@ -9,7 +9,7 @@ import {
   getEstudianteByUsuario
 } from "../controllers/estudiante.controller.js";
 import { verificarToken } from "../middlewares/auth.middleware.js";
-import upload from "../config/multer.js";
+import { upload } from "../middlewares/upload.middleware.js";
 
 const router = Router();
 

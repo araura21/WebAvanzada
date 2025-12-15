@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from 'react-bootstrap';
 
-const PerfilEstudiante = () => {
-    const [estudiante, setEstudiante] = useState(null);
+const PerfilDocente = () => {
+    const [docente, setDocente] = useState(null);
     const [loading, setLoading] = useState(true);
     const usuario = localStorage.getItem('usuario'); // Correo o cédula
 
     useEffect(() => {
         const fetchPerfil = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/estudiantes/perfil/${usuario}`);
+                const response = await fetch(`http://localhost:3000/api/docentes/perfil/${usuario}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
                 if (response.ok) {
                     const data = await response.json();
-                    setEstudiante(data);
-                    // Guardar ID para otras consultas
-                    localStorage.setItem('estudianteId', data.id);
+                    setDocente(data);
+                    // Guardar ID
+                    localStorage.setItem('docenteId', data.id);
                 } else {
                     console.error("No se encontró perfil");
                 }
@@ -33,7 +35,7 @@ const PerfilEstudiante = () => {
     }, [usuario]);
 
     if (loading) return <div>Cargando perfil...</div>;
-    if (!estudiante) return <div>No se encontró información del estudiante.</div>;
+    if (!docente) return <div>No se encontró información del docente.</div>;
 
     return (
         <div className="container mt-4">
@@ -42,45 +44,41 @@ const PerfilEstudiante = () => {
                 <Card.Body>
                     <div className="row">
                         <div className="col-md-4 text-center">
-                            {estudiante.foto ? (
-                                <img src={`http://localhost:3000/${estudiante.foto.replace(/\\/g, '/')}`} alt="Perfil" className="img-thumbnail rounded-circle" style={{ width: '150px', height: '150px', objectFit: 'cover' }} />
+                            {docente.foto ? (
+                                <img src={`http://localhost:3000/${docente.foto.replace(/\\/g, '/')}`} alt="Perfil" className="img-thumbnail rounded-circle" style={{ width: '150px', height: '150px', objectFit: 'cover' }} />
                             ) : (
                                 <div className="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" style={{ width: '150px', height: '150px', fontSize: '3rem' }}>
-                                    {estudiante.nombres.charAt(0)}{estudiante.apellidos.charAt(0)}
+                                    {docente.nombres?.charAt(0)}{docente.apellidos?.charAt(0)}
                                 </div>
                             )}
-                            <h4 className="mt-3">{estudiante.nombres} {estudiante.apellidos}</h4>
-                            <p className="text-muted">Estudiante</p>
+                            <h4 className="mt-3">{docente.nombres} {docente.apellidos}</h4>
+                            <p className="text-muted">Docente</p>
                         </div>
                         <div className="col-md-8">
                             <h5 className="mb-3 border-bottom pb-2">Información Personal</h5>
                             <div className="row mb-2">
                                 <div className="col-sm-4 fw-bold">Cédula:</div>
-                                <div className="col-sm-8">{estudiante.cedula}</div>
+                                <div className="col-sm-8">{docente.cedula}</div>
                             </div>
                             <div className="row mb-2">
                                 <div className="col-sm-4 fw-bold">Correo:</div>
-                                <div className="col-sm-8">{estudiante.correo}</div>
+                                <div className="col-sm-8">{docente.correo}</div>
                             </div>
                             <div className="row mb-2">
                                 <div className="col-sm-4 fw-bold">Teléfono:</div>
-                                <div className="col-sm-8">{estudiante.telefono || 'No registrado'}</div>
+                                <div className="col-sm-8">{docente.telefono || 'No registrado'}</div>
                             </div>
 
-                            <h5 className="mb-3 mt-4 border-bottom pb-2">Información Académica</h5>
+                            <h5 className="mb-3 mt-4 border-bottom pb-2">Información Profesional</h5>
                             <div className="row mb-2">
-                                <div className="col-sm-4 fw-bold">Curso:</div>
-                                <div className="col-sm-8">{estudiante.curso || 'No asignado'}</div>
-                            </div>
-                            <div className="row mb-2">
-                                <div className="col-sm-4 fw-bold">Paralelo:</div>
-                                <div className="col-sm-8">{estudiante.paralelo || 'No asignado'}</div>
+                                <div className="col-sm-4 fw-bold">Especialidad:</div>
+                                <div className="col-sm-8">{docente.especialidad || 'General'}</div>
                             </div>
                             <div className="row mb-2">
                                 <div className="col-sm-4 fw-bold">Estado:</div>
                                 <div className="col-sm-8">
-                                    <span className={`badge ${estudiante.estado === 'activo' ? 'bg-success' : 'bg-danger'}`}>
-                                        {estudiante.estado}
+                                    <span className={`badge ${docente.estado === 'activo' ? 'bg-success' : 'bg-danger'}`}>
+                                        {docente.estado}
                                     </span>
                                 </div>
                             </div>
@@ -92,4 +90,4 @@ const PerfilEstudiante = () => {
     );
 };
 
-export default PerfilEstudiante;
+export default PerfilDocente;

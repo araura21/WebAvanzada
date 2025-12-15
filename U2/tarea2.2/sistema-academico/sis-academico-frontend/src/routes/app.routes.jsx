@@ -26,6 +26,7 @@ import DashboardDocente from '../pages/docente/DashboardDocente';
 import MisClases from '../pages/docente/MisClases';
 import GestionNotas from '../pages/docente/GestionNotas';
 import ResumenNotasDocente from '../pages/docente/ResumenNotasDocente';
+import PerfilDocente from '../pages/docente/PerfilDocente';
 
 const DefaultRedirect = () => {
     const rol = localStorage.getItem('rol');
@@ -83,6 +84,7 @@ const AppRoutes = ({ isAuthenticated, onLogout }) => {
                         <Route path="/docente/clases" element={<ProtectedRoute allowedRoles={['docente']}><MisClases /></ProtectedRoute>} />
                         <Route path="/docente/notas/:id" element={<ProtectedRoute allowedRoles={['docente']}><GestionNotas /></ProtectedRoute>} />
                         <Route path="/docente/resumen" element={<ProtectedRoute allowedRoles={['docente']}><ResumenNotasDocente /></ProtectedRoute>} />
+                        <Route path="/docente/perfil" element={<ProtectedRoute allowedRoles={['docente']}><PerfilDocente /></ProtectedRoute>} />
 
                         <Route path="/ayuda" element={<Ayuda />} />
                         <Route path="*" element={<DefaultRedirect />} />

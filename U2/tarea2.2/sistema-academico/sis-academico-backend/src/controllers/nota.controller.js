@@ -7,7 +7,7 @@ import { Asignatura } from "../models/asignatura.model.js";
 export const getNotas = async (req, res) => {
   try {
     const { estudianteId, docenteId, asignaturaId, parcial } = req.query;
-    
+
     const whereClause = { estado: "activo" };
     if (estudianteId) whereClause.estudianteId = estudianteId;
     if (docenteId) whereClause.docenteId = docenteId;
@@ -49,10 +49,10 @@ export const getNotaById = async (req, res) => {
 // Crear una nueva nota
 export const createNota = async (req, res) => {
   try {
-    const { 
-      estudianteId, asignaturaId, docenteId, parcial, 
-      nota_tarea, nota_informe, nota_leccion, nota_examen, 
-      observaciones 
+    const {
+      estudianteId, asignaturaId, docenteId, parcial,
+      nota_tarea, nota_informe, nota_leccion, nota_examen,
+      observaciones
     } = req.body;
 
     // Validaciones básicas
@@ -86,7 +86,7 @@ export const updateNota = async (req, res) => {
   try {
     const { id } = req.params;
     const nota = await Nota.findByPk(id);
-    
+
     if (!nota) return res.status(404).json({ message: "Nota no encontrada" });
 
     await nota.update(req.body);

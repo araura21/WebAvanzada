@@ -1,8 +1,26 @@
 import Usuario from "../models/auth.model.js";
 import Estudiante from "../models/estudiante.model.js";
 import Docente from "../models/docente.model.js";
+import { Asignatura } from "../models/asignatura.model.js";
 import sequelize from "../config/database.js";
 import bcrypt from "bcrypt";
+
+export const getDashboardStats = async (req, res) => {
+    try {
+        const totalEstudiantes = await Estudiante.count({ where: { estado: 'activo' } });
+        const totalDocentes = await Docente.count({ where: { estado: 'activo' } });
+        const totalAsignaturas = await Asignatura.count({ where: { estado: true } });
+
+        res.json({
+            estudiantes: totalEstudiantes,
+            docentes: totalDocentes,
+            asignaturas: totalAsignaturas
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error al obtener estadisticas" });
+    }
+};
 
 // Crear Usuario + Estudiante (Atomic)
 export const createUsuarioEstudiante = async (req, res) => {
@@ -40,7 +58,7 @@ export const createUsuarioEstudiante = async (req, res) => {
             telefono,
             curso,
             usuarioId: nuevoUsuario.id,
-            foto: req.file ? req.file.path : null,
+            foto: req.file ? "uploads/" + req.file.filename : null,
             estado: 'activo'
         }, { transaction: t });
 
@@ -89,7 +107,7 @@ export const createUsuarioDocente = async (req, res) => {
             telefono,
             especialidad,
             usuarioId: nuevoUsuario.id,
-            foto: req.file ? req.file.path : null,
+            foto: req.file ? "uploads/" + req.file.filename : null,
             estado: 'activo'
         }, { transaction: t });
 

@@ -48,11 +48,11 @@ const Sidebar = () => {
                   <i className="bi bi-card-checklist"></i> Matrículas
                 </Link>
               </li>
-              <li>
+              {/*<li>
                 <Link to="/admin/logs" className={isActive('/admin/logs')}>
                   <i className="bi bi-shield-lock"></i> Auditoría
                 </Link>
-              </li>
+              </li>*/}
             </>
           )}
 
@@ -68,6 +68,11 @@ const Sidebar = () => {
                   <i className="bi bi-table"></i> Resumen de Notas
                 </Link>
               </li>
+              <li>
+                <Link to="/docente/perfil" className={isActive('/docente/perfil')}>
+                  <i className="bi bi-person-circle"></i> Mi Perfil
+                </Link>
+              </li>
             </>
           )}
 
@@ -81,6 +86,11 @@ const Sidebar = () => {
               <li>
                 <Link to="/estudiante/notas" className={isActive('/estudiante/notas')}>
                   <i className="bi bi-bar-chart"></i> Mis Notas
+                </Link>
+              </li>
+              <li>
+                <Link to="/estudiante/perfil" className={isActive('/estudiante/perfil')}>
+                  <i className="bi bi-person-circle"></i> Mi Perfil
                 </Link>
               </li>
               {/* <li>
