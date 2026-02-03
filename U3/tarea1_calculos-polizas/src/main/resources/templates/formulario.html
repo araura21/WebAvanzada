@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Pólizas de Seguro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #a0aec0;
+            font-size: 1.1rem;
+        }
+
+        /* Progress Steps */
+        .progress-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+
+        .step.completed {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step.active .step-number {
+            background: #00d4ff;
+            color: #1a1a2e;
+        }
+
+        .step.completed .step-number {
+            background: #10b981;
+            color: white;
+        }
+
+        /* Form Sections */
+        .form-container {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+
+        .label-icon {
+            font-size: 1.2rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder {
+            color: #64748b;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .form-group select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .field-hint {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .info-box {
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .info-box h4 {
+            margin-bottom: 10px;
+            color: #a78bfa;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 10px;
+        }
+
+        .info-box li {
+            padding: 5px 0;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn {
+            padding: 15px 35px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-prev {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-prev:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            color: #fff;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            width: 100%;
+            justify-content: center;
+            font-size: 1.2rem;
+            padding: 18px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Result Section */
+        #resultado {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+            border: 2px solid #10b981;
+            border-radius: 20px;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #resultado h3 {
+            font-size: 1.5rem;
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        .result-value {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .total-cost {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #10b981;
+            margin: 20px 0;
+        }
+
+        .btn-new {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: auto;
+        }
+
+        .btn-new:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+        }
+
+        .btn-pdf:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            color: #fca5a5;
+            display: none;
+        }
+
+        /* Validación en tiempo real */
+        .field-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
+        .form-group input.invalid,
+        .form-group select.invalid {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .form-group input.valid,
+        .form-group select.valid {
+            border-color: #10b981 !important;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .progress-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🛡️ Calculadora de Pólizas</h1>
+            <p>Complete los datos para calcular el costo de su póliza de seguro vehicular</p>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-container">
+            <div class="step active" id="step1">
+                <span class="step-number">1</span>
+                <span>Propietario</span>
+            </div>
+            <div class="step" id="step2">
+                <span class="step-number">2</span>
+                <span>Automóvil</span>
+            </div>
+            <div class="step" id="step3">
+                <span class="step-number">3</span>
+                <span>Resultado</span>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <form id="polizaForm">
+                <!-- Sección Propietario (incluida desde propietario.html) -->
+                <div th:replace="~{propietario :: form-propietario}" class="form-section active"></div>
+
+                <!-- Sección Automóvil (incluida desde automovil.html) -->
+                <div th:replace="~{automovil :: form-automovil}" class="form-section"></div>
+
+                <!-- Sección de Confirmación -->
+                <div class="form-section" id="seccion-confirmacion">
+                    <div class="section-header">
+                        <span class="section-icon">✅</span>
+                        <h2>Confirmar y Generar Póliza</h2>
+                    </div>
+
+                    <div class="result-card">
+                        <h4 style="color: #64748b; margin-bottom: 20px;">Resumen de Datos</h4>
+                        
+                        <div class="result-item">
+                            <span class="result-label"> Propietario:</span>
+                            <span class="result-value" id="resumen-nombre">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label"> Edad:</span>
+                            <span class="result-value" id="resumen-edad">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">️ Accidentes:</span>
+                            <span class="result-value" id="resumen-accidentes">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label"> Modelo:</span>
+                            <span class="result-value" id="resumen-modelo">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label"> Valor del Auto:</span>
+                            <span class="result-value" id="resumen-valor">-</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box" style="background: rgba(0, 212, 255, 0.1); border-color: rgba(0, 212, 255, 0.3);">
+                        <h4 style="color: #00d4ff;"> Factores que afectan el costo:</h4>
+                        <ul>
+                            <li>• <strong>Edad ≤24:</strong> +$360 | <strong>25-53:</strong> +$240 | <strong>54+:</strong> +$430</li>
+                            <li>• <strong>Accidentes:</strong> $17 c/u (primeros 3) | $21 c/u (adicionales)</li>
+                            <li>• <strong>Valor del auto:</strong> 3.5% del valor base</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="btn btn-submit" style="margin-top: 30px;">
+                        Generar Póliza
+                    </button>
+                </div>
+            </form>
+
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons" id="navButtons">
+                <button type="button" class="btn btn-prev" id="btnPrev" style="visibility: hidden;">
+                    ← Anterior
+                </button>
+                <button type="button" class="btn btn-next" id="btnNext">
+                    Siguiente →
+                </button>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Calculando póliza...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage">
+                <strong>❌ Error:</strong> <span id="errorText"></span>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="resultado">
+            <h3>🎉 ¡Póliza Generada Exitosamente!</h3>
+            
+            <div class="result-card">
+                <div class="result-item">
+                    <span class="result-label">� N° de Póliza:</span>
+                    <span class="result-value" id="result-id">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">👤 Propietario:</span>
+                    <span class="result-value" id="result-propietario">-</span>
+                </div>
+            </div>
+
+            <p style="color: #94a3b8; margin-top: 20px;">Costo Total de la Póliza:</p>
+            <div class="total-cost" id="result-costo">$0.00</div>
+
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-pdf" id="btnPdf" onclick="descargarPdf()">
+                    📄 Descargar PDF
+                </button>
+                <button type="button" class="btn btn-new" onclick="nuevaConsulta()">
+                    🔄 Nueva Consulta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables de estado
+        let currentStep = 1;
+        const totalSteps = 3;
+        let polizaId = null; // ID de la póliza generada para descargar PDF
+
+        // Elementos DOM
+        const form = document.getElementById('polizaForm');
+        const sections = document.querySelectorAll('.form-section');
+        const steps = document.querySelectorAll('.step');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const navButtons = document.getElementById('navButtons');
+        const resultado = document.getElementById('resultado');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateView();
+        });
+
+        // Navegación
+        btnNext.addEventListener('click', function() {
+            if (validateCurrentStep()) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateView();
+                    if (currentStep === 3) {
+                        updateResumen();
+                    }
+                }
+            }
+        });
+
+        btnPrev.addEventListener('click', function() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateView();
+            }
+        });
+
+        // Actualizar vista
+        function updateView() {
+            // Actualizar secciones
+            sections.forEach((section, index) => {
+                section.classList.toggle('active', index === currentStep - 1);
+            });
+
+            // Actualizar pasos
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                } else if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                }
+            });
+
+            // Actualizar botones
+            btnPrev.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            
+            if (currentStep === totalSteps) {
+                navButtons.style.display = 'none';
+            } else {
+                navButtons.style.display = 'flex';
+                btnNext.style.display = 'flex';
+            }
+
+            // Ocultar resultado y errores al navegar
+            resultado.style.display = 'none';
+            errorMessage.style.display = 'none';
+        }
+
+        // Validar paso actual
+        function validateCurrentStep() {
+            let isValid = true;
+            const currentSection = sections[currentStep - 1];
+            const inputs = currentSection.querySelectorAll('input[required], select[required]');
+            let errorMessages = [];
+
+            inputs.forEach(input => {
+                const validation = validateField(input);
+                if (!validation.valid) {
+                    isValid = false;
+                    errorMessages.push(validation.message);
+                    input.classList.add('invalid');
+                    input.classList.remove('valid');
+                    showFieldError(input, validation.message);
+                    input.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => {
+                        input.style.animation = '';
+                    }, 500);
+                } else {
+                    input.classList.remove('invalid');
+                    input.classList.add('valid');
+                    hideFieldError(input);
+                }
+            });
+
+            if (!isValid && errorMessages.length > 0) {
+                showError(errorMessages.join(' | '));
+            } else {
+                errorMessage.style.display = 'none';
+            }
+
+            return isValid;
+        }
+
+        // Validar campo individual
+        function validateField(input) {
+            const value = input.value.trim();
+            const id = input.id;
+
+            // Validación de campo vacío
+            if (!value) {
+                return { valid: false, message: `El campo ${getFieldName(id)} es requerido` };
+            }
+
+            // Validaciones específicas
+            switch(id) {
+                case 'nombre':
+                    if (value.length < 3) {
+                        return { valid: false, message: 'El nombre debe tener al menos 3 caracteres' };
+                    }
+                    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(value)) {
+                        return { valid: false, message: 'El nombre solo puede contener letras' };
+                    }
+                    break;
+                case 'edad':
+                    const edad = parseInt(value);
+                    if (isNaN(edad)) {
+                        return { valid: false, message: 'La edad debe ser un número' };
+                    }
+                    if (edad < 18) {
+                        return { valid: false, message: 'El propietario debe ser mayor de 18 años (mínimo 18)' };
+                    }
+                    if (edad > 120) {
+                        return { valid: false, message: 'La edad no puede ser mayor a 120 años' };
+                    }
+                    break;
+                case 'accidentes':
+                    const accidentes = parseInt(value);
+                    if (isNaN(accidentes)) {
+                        return { valid: false, message: 'Los accidentes deben ser un número' };
+                    }
+                    if (accidentes < 0) {
+                        return { valid: false, message: 'Los accidentes no pueden ser negativos' };
+                    }
+                    if (accidentes > 99) {
+                        return { valid: false, message: 'El número de accidentes no puede ser mayor a 99' };
+                    }
+                    break;
+                case 'valorAuto':
+                    const valorAuto = parseFloat(value);
+                    if (isNaN(valorAuto)) {
+                        return { valid: false, message: 'El valor del auto debe ser un número' };
+                    }
+                    if (valorAuto < 1000) {
+                        return { valid: false, message: 'El valor del auto debe ser al menos $1,000' };
+                    }
+                    if (valorAuto > 10000000) {
+                        return { valid: false, message: 'El valor del auto no puede exceder $10,000,000' };
+                    }
+                    break;
+                case 'modelo':
+                    if (!['A', 'B', 'C'].includes(value)) {
+                        return { valid: false, message: 'Debe seleccionar un modelo válido (A, B o C)' };
+                    }
+                    break;
+            }
+
+            return { valid: true, message: '' };
+        }
+
+        // Obtener nombre amigable del campo
+        function getFieldName(id) {
+            const names = {
+                'nombre': 'Nombre',
+                'edad': 'Edad',
+                'accidentes': 'Accidentes',
+                'modelo': 'Modelo',
+                'valorAuto': 'Valor del Auto'
+            };
+            return names[id] || id;
+        }
+
+        // Mostrar error en campo específico
+        function showFieldError(input, message) {
+            let errorSpan = input.parentElement.querySelector('.field-error');
+            if (!errorSpan) {
+                errorSpan = document.createElement('span');
+                errorSpan.className = 'field-error';
+                input.parentElement.appendChild(errorSpan);
+            }
+            errorSpan.textContent = '⚠️ ' + message;
+            errorSpan.classList.add('show');
+        }
+
+        // Ocultar error en campo específico
+        function hideFieldError(input) {
+            const errorSpan = input.parentElement.querySelector('.field-error');
+            if (errorSpan) {
+                errorSpan.classList.remove('show');
+            }
+        }
+
+        // Actualizar resumen
+        function updateResumen() {
+            document.getElementById('resumen-nombre').textContent = document.getElementById('nombre').value;
+            document.getElementById('resumen-edad').textContent = document.getElementById('edad').value + ' años';
+            document.getElementById('resumen-accidentes').textContent = document.getElementById('accidentes').value;
+            
+            const modeloSelect = document.getElementById('modelo');
+            const modeloText = modeloSelect.options[modeloSelect.selectedIndex].text;
+            document.getElementById('resumen-modelo').textContent = modeloText;
+            
+            const valorAuto = parseFloat(document.getElementById('valorAuto').value);
+            document.getElementById('resumen-valor').textContent = '$' + valorAuto.toLocaleString('en-US', {minimumFractionDigits: 2});
+        }
+
+        // Enviar formulario
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Ocultar elementos y mostrar loading
+            navButtons.style.display = 'none';
+            loading.style.display = 'block';
+            errorMessage.style.display = 'none';
+
+            // Preparar datos
+            const datos = {
+                nombre: document.getElementById('nombre').value,
+                edad: parseInt(document.getElementById('edad').value),
+                accidentes: parseInt(document.getElementById('accidentes').value),
+                modelo: document.getElementById('modelo').value,
+                valorAuto: parseFloat(document.getElementById('valorAuto').value)
+            };
+
+            try {
+                const response = await fetch('/api/polizas/cliente', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    // Mostrar errores de validación detallados del servidor
+                    if (errorData.details) {
+                        const errorList = Object.entries(errorData.details)
+                            .map(([field, msg]) => `${getFieldName(field)}: ${msg}`)
+                            .join(' | ');
+                        throw new Error(errorList);
+                    }
+                    throw new Error(errorData.message || 'Error al calcular la póliza');
+                }
+
+                const data = await response.json();
+                
+                // Guardar el ID de la póliza para descarga de PDF
+                polizaId = data.id;
+                
+                // Mostrar resultado
+                loading.style.display = 'none';
+                resultado.style.display = 'block';
+                
+                document.getElementById('result-id').textContent = 'POL-' + String(data.id).padStart(6, '0');
+                document.getElementById('result-propietario').textContent = data.propietario;
+                document.getElementById('result-costo').textContent = '$' + data.costoTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+                // Actualizar paso final como completado
+                steps[2].classList.remove('active');
+                steps[2].classList.add('completed');
+
+            } catch (error) {
+                loading.style.display = 'none';
+                showError(error.message);
+                navButtons.style.display = 'flex';
+            }
+        });
+
+        // Mostrar error
+        function showError(message) {
+            errorMessage.style.display = 'block';
+            document.getElementById('errorText').textContent = message;
+        }
+
+        // Nueva consulta
+        function nuevaConsulta() {
+            form.reset();
+            currentStep = 1;
+            polizaId = null;
+            resultado.style.display = 'none';
+            errorMessage.style.display = 'none';
+            navButtons.style.display = 'flex';
+            updateView();
+        }
+
+        // Descargar PDF
+        function descargarPdf() {
+            if (!polizaId) {
+                showError('No hay póliza generada para descargar');
+                return;
+            }
+
+            // Crear enlace de descarga
+            const link = document.createElement('a');
+            link.href = '/api/polizas/' + polizaId + '/pdf';
+            link.download = 'poliza_' + polizaId + '.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Añadir animación de shake para validación
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Validación en tiempo real cuando el usuario escribe
+        document.addEventListener('DOMContentLoaded', function() {
+            const allInputs = document.querySelectorAll('input, select');
+            
+            allInputs.forEach(input => {
+                // Validar al perder el foco
+                input.addEventListener('blur', function() {
+                    const validation = validateField(this);
+                    if (!validation.valid) {
+                        this.classList.add('invalid');
+                        this.classList.remove('valid');
+                        showFieldError(this, validation.message);
+                    } else {
+                        this.classList.remove('invalid');
+                        this.classList.add('valid');
+                        hideFieldError(this);
+                    }
+                });
+
+                // Validar mientras escribe (con debounce)
+                input.addEventListener('input', function() {
+                    clearTimeout(this.validationTimeout);
+                    this.validationTimeout = setTimeout(() => {
+                        const validation = validateField(this);
+                        if (validation.valid) {
+                            this.classList.remove('invalid');
+                            this.classList.add('valid');
+                            hideFieldError(this);
+                        }
+                    }, 500);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

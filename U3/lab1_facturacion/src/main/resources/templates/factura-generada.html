@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura Generada</title>
+    <link rel="stylesheet" th:href="@{/css/factura-generada.css}" href="/css/factura-generada.css" />
+    <style>
+        .factura-container { background: #fff; padding: 24px; max-width: 900px; margin: 24px auto; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
+        .factura-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .logo { width: 160px; }
+        .factura-info { font-size: 0.95em; }
+        .factura-title { font-size: 1.5em; font-weight: bold; letter-spacing: 0.2em; }
+        .factura-table, .factura-table th, .factura-table td { border: 1px solid #222; border-collapse: collapse; }
+        .factura-table th, .factura-table td { padding: 4px 8px; text-align: center; }
+        .factura-table th { background: #f0f0f0; }
+        .totales-table { width: 100%; margin-top: 8px; }
+        .totales-table td { padding: 2px 8px; }
+        .info-adicional { margin-top: 12px; }
+        .botones { margin-top: 24px; display: flex; gap: 16px; justify-content: flex-end; }
+    </style>
+</head>
+<body>
+<div class="factura-container">
+    <div class="factura-header">
+        <div>
+            <img class="logo" th:src="@{/img/logo-picanteria.png}" src="/img/logo-picanteria.png" alt="Logo Picantería" />
+        </div>
+        <div class="factura-info">
+            <div><b>R.U.C.:</b> <span th:text="${T(com.facturacion.facturacion.model.Factura).RUC_EMISOR}"></span></div>
+            <div class="factura-title">FACTURA</div>
+            <div><b>No:</b> <span style="color:red">001-001-000001336</span></div>
+            <div><b>NÚMERO DE AUTORIZACIÓN:</b><br><span th:text="${factura.claveAcceso}"></span></div>
+            <div><b>FECHA Y HORA DE AUTORIZACIÓN:</b> <span th:text="${factura.fechaFormateada}"></span></div>
+            <div><b>AMBIENTE:</b> PRODUCCION</div>
+            <div><b>EMISIÓN:</b> NORMAL</div>
+            <div><b>CLAVE DE ACCESO:</b><br><span th:text="${factura.claveAcceso}"></span></div>
+        </div>
+    </div>
+    <hr>
+    <div style="display: flex; justify-content: space-between;">
+        <div>
+            <b th:text="${T(com.facturacion.facturacion.model.Factura).RAZON_SOCIAL_EMISOR}"></b><br>
+            <span th:text="${T(com.facturacion.facturacion.model.Factura).NOMBRE_COMERCIAL}"></span><br>
+            <b>DIRECCIÓN:</b> <span th:text="${T(com.facturacion.facturacion.model.Factura).DIRECCION_EMISOR}"></span><br>
+            <b>DIR. SUCURSAL:</b> <span th:text="${T(com.facturacion.facturacion.model.Factura).SUCURSAL_EMISOR}"></span><br>
+            <b>OBLIGADO A LLEVAR CONTABILIDAD:</b> <span th:text="${T(com.facturacion.facturacion.model.Factura).OBLIGADO_CONTABILIDAD}"></span>
+        </div>
+        <div style="text-align:right;">
+            <b>RAZON SOCIAL:</b> <span th:text="${factura.razonSocialCliente}"></span><br>
+            <b>RUC / CI:</b> <span th:text="${factura.rucCliente}"></span><br>
+            <b>FECHA DE EMISION:</b> <span th:text="${factura.fechaFormateada}"></span><br>
+            <b>DIRECCION:</b> <span th:text="${factura.direccionCliente}"></span>
+        </div>
+    </div>
+    <hr>
+    <table class="factura-table" width="100%">
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>CODIGO</th>
+            <th>DESCRIPCION</th>
+            <th>CANTIDAD</th>
+            <th>PRECIO U.</th>
+            <th>TOTAL</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="detalle, iterStat : ${factura.detalles}">
+            <td th:text="${iterStat.index + 1}"></td>
+            <td th:text="${detalle.codigo}"></td>
+            <td th:text="${detalle.descripcion}"></td>
+            <td th:text="${detalle.cantidad}"></td>
+            <td th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 'POINT', 2, 'ZERO')}"></td>
+            <td th:text="${#numbers.formatDecimal(detalle.cantidad * detalle.precioUnitario, 1, 'POINT', 2, 'ZERO')}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="totales-table">
+        <tr><td style="text-align:right;">SUBTOTAL SIN IVA:</td><td th:text="${factura.subtotalSinIva}"></td></tr>
+        <tr><td style="text-align:right;">SUBTOTAL CON IVA:</td><td th:text="${factura.subtotalConIva}"></td></tr>
+        <tr><td style="text-align:right;">VALOR DEL IVA:</td><td th:text="${factura.valorIva}"></td></tr>
+        <tr><td style="text-align:right;">VALOR DEL DESCUENTO:</td><td th:text="${factura.valorDescuento}"></td></tr>
+        <tr><td style="text-align:right; font-weight:bold;">VALOR TOTAL:</td><td th:text="${factura.valorTotal}"></td></tr>
+    </table>
+    <div class="info-adicional">
+        <b>INFORMACIÓN ADICIONAL</b><br>
+        <b>Correo:</b> <span th:text="${factura.correoCliente}"></span><br>
+        <b>Teléfono:</b> <span th:text="${factura.telefonoCliente}"></span><br>
+        <b>Forma de Pago:</b> <span th:text="${factura.formaPago}"></span>
+    </div>
+    <div class="botones">
+        <a href="/factura/pdf"><button type="button">Guardar en PDF</button></a>
+        <a href="/factura/nueva"><button type="button">Nueva Factura</button></a>
+    </div>
+</div>
+</body>
+</html>
+                <div class="form-group">
+                    <label>RUC/CI:</label>
+                    <p th:text="${factura.rucCliente}"></p>
+                </div>
+                <div class="form-group">
+                    <label>Razón Social / Nombre:</label>
+                    <p th:text="${factura.razonSocialCliente}"></p>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Dirección:</label>
+                    <p th:text="${factura.direccionCliente}"></p>
+                </div>
+                <div class="form-group">
+                    <label>Correo Electrónico:</label>
+                    <p th:text="${factura.correo}"></p>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Teléfono:</label>
+                    <p th:text="${factura.telefono}"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: DATOS DE LA FACTURA -->
+        <div class="section">
+            <h2>📋 Datos de la Factura</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Número de Factura:</label>
+                    <p th:text="${factura.numeroFactura}"></p>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Emisión:</label>
+                    <p th:text="${factura.fechaEmision}"></p>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Número de Autorización:</label>
+                    <p th:text="${factura.numeroAutorizacion}"></p>
+                </div>
+                <div class="form-group">
+                    <label>Clave de Acceso:</label>
+                    <p th:text="${factura.claveAcceso}"></p>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Ambiente:</label>
+                    <p th:text="${factura.ambiente}"></p>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Emisión:</label>
+                    <p th:text="${factura.tipoEmision}"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: DETALLES DE PRODUCTOS -->
+        <div class="section">
+            <h2>🛒 Productos / Servicios</h2>
+            <div class="detalle-header">
+                <div>Código</div>
+                <div>Descripción</div>
+                <div>Cantidad</div>
+                <div>Precio Unit.</div>
+                <div>Descuento</div>
+                <div>Subtotal</div>
+            </div>
+            <div id="detalles-container" th:if="${factura.detalles != null and factura.detalles.size() > 0}">
+                <div th:each="detalle : ${factura.detalles}" class="detalle-row">
+                    <div th:text="${detalle.codigo}"></div>
+                    <div th:text="${detalle.descripcion}"></div>
+                    <div th:text="${detalle.cantidad}"></div>
+                    <div th:text="${detalle.precioUnitario != null} ? ${'$' + #numbers.formatDecimal(detalle.precioUnitario, 1, 2)} : '$0.00'"></div>
+                    <div th:text="${detalle.descuento != null} ? ${'$' + #numbers.formatDecimal(detalle.descuento, 1, 2)} : '$0.00'"></div>
+                    <div th:text="${detalle.subtotal != null} ? ${'$' + #numbers.formatDecimal(detalle.subtotal, 1, 2)} : '$0.00'"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: TOTALES -->
+        <div class="section">
+            <h2>💰 Totales</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Subtotal (sin IVA):</label>
+                    <p th:text="${factura.subtotalSinImpuestos != null} ? ${'$' + #numbers.formatDecimal(factura.subtotalSinImpuestos, 1, 2)} : '$0.00'"></p>
+                </div>
+                <div class="form-group">
+                    <label>Total Descuento:</label>
+                    <p th:text="${factura.totalDescuento != null} ? ${'$' + #numbers.formatDecimal(factura.totalDescuento, 1, 2)} : '$0.00'"></p>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>IVA (15%):</label>
+                    <p th:text="${factura.iva15 != null} ? ${'$' + #numbers.formatDecimal(factura.iva15, 1, 2)} : '$0.00'"></p>
+                </div>
+                <div class="form-group">
+                    <label><strong>Valor Total:</strong></label>
+                    <p><strong th:text="${factura.valorTotal != null} ? ${'$' + #numbers.formatDecimal(factura.valorTotal, 1, 2)} : '$0.00'"></strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 6: FORMA DE PAGO -->
+        <div class="section">
+            <h2>💳 Forma de Pago</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Código:</label>
+                    <p th:text="${factura.codigoFormaPago}"></p>
+                </div>
+                <div class="form-group">
+                    <label>Plazo (días):</label>
+                    <p th:text="${factura.plazoFormaPago}"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="section" style="display: flex; gap: 20px; justify-content: center;">
+            <button class="btn-submit" onclick="descargarPDF()" style="flex: 1; background: #2196F3;">📥 Descargar PDF</button>
+            <button class="btn-submit" onclick="generarNuevaFactura()" style="flex: 1; background: #4CAF50;">➕ Generar Nueva Factura</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function descargarPDF() {
+        alert('La funcionalidad de descarga PDF será implementada próximamente.');
+        // TODO: Implementar descarga de PDF
+    }
+
+    function generarNuevaFactura() {
+        window.location.href = '/factura/nueva';
+    }
+</script>
+</body>
+</html>
+
+

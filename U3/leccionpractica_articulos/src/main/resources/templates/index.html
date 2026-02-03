@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Inventario</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+    <div class="main-container">
+        <h1>Control de Artículos y Rubros</h1>
+
+        <div class="forms-wrapper">
+            
+            <div class="card form-card">
+                <h2>1. Crear Rubro</h2>
+                <form id="formRubro">
+                    <div class="form-group">
+                        <label>Nombre del Rubro:</label>
+                        <input type="text" id="nombreRubro" placeholder="Ej: Lácteos" required>
+                    </div>
+                    <button type="submit">Guardar Rubro</button>
+                </form>
+            </div>
+
+            <div class="card form-card">
+                <h2>2. Crear Artículo</h2>
+                <form id="formArticulo">
+                    <div class="form-group">
+                        <label>Nombre Artículo:</label>
+                        <input type="text" id="nombreArticulo" placeholder="Ej: Leche Entera" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio:</label>
+                        <input type="number" step="0.01" id="precioArticulo" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Asignar a Rubro:</label>
+                        <select id="rubroSelect" required>
+                            <option value="" disabled selected>Seleccione un rubro...</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-secondary">Guardar Artículo</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <h2>Listado de Artículos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Artículo</th>
+                        <th>Precio</th>
+                        <th>Rubro Asignado</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-articulos">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script th:src="@{/js/index.js}"></script>
+</body>
+</html>

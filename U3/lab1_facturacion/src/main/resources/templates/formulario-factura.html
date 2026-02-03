@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Factura</title>
+    
+    <link rel="stylesheet" th:href="@{/css/formulario-factura.css}" href="/css/formulario-factura.css" />
+<div class="container">
+    <h1>Generar Nueva Factura</h1>
+
+    <!-- Mensaje de error si existe -->
+    <div th:if="${error}" class="error-message">
+        <strong>Error:</strong> <span th:text="${error}"></span>
+    </div>
+
+    <form th:action="@{/factura/procesar}" th:object="${factura}" method="post">
+
+
+        <!-- SECCIÓN 1: INFORMACIÓN DEL CLIENTE -->
+        <div class="section">
+            <h2>Información del Cliente</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>RUC/CI <span class="required">*</span></label>
+                    <input type="text" th:field="*{rucCliente}" required placeholder="1754459160" pattern="[0-9]{10,13}" maxlength="13">
+                
+                    <label>Razón Social / Nombre <span class="required">*</span></label>
+                    <input type="text" th:field="*{razonSocialCliente}" required placeholder="ANDREA RAURA">
+                
+                    <label>Dirección</label>
+                    <input type="text" th:field="*{direccionCliente}" placeholder="LATACUNGA">
+                
+                    <label>Correo Electrónico</label>
+                    <input type="email" th:field="*{correoCliente}" placeholder="cliente@email.com">
+                
+                    <label>Teléfono</label>
+                    <input type="tel" th:field="*{telefonoCliente}" placeholder="0997835381" pattern="[0-9]{10}">
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: INFORMACIÓN DEL CLIENTE -->
+        <div class="section">
+            <h2>Información del Cliente</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>RUC/CI <span class="required">*</span></label>
+                    <input type="text" th:field="*{rucCliente}" required placeholder="1754459160" pattern="[0-9]{13}" maxlength="13">
+                
+                    <label>Razón Social / Nombre <span class="required">*</span></label>
+                    <input type="text" th:field="*{razonSocialCliente}" required placeholder="ANDREA RAURA">
+                
+                    <label>Dirección</label>
+                    <input type="text" th:field="*{direccionCliente}" placeholder="LATACUNGA">
+                
+                    <label>Correo Electrónico</label>
+                    <input type="email" th:field="*{correo}" placeholder="cliente@email.com">
+                
+                    <label>Teléfono</label>
+                    <input type="tel" th:field="*{telefono}" placeholder="0997835381" pattern="[0-9]{10}" maxlength="10">
+                </div>
+            </div>
+        </div>
+
+
+        <!-- SECCIÓN 2: DETALLES DE PRODUCTOS -->
+        <div class="section">
+            <h2>Productos</h2>
+            <div class="detalle-header">
+                <div>Código</div>
+                <div>Descripción</div>
+                <div>Cantidad</div>
+                <div>Precio Unit.</div>
+                <div>Acción</div>
+            </div>
+            <div id="detalles-container">
+                <div th:each="detalle, iterStat : *{detalles}" class="detalle-row">
+                    <input type="text" th:field="*{detalles[__${iterStat.index}__].codigo}" placeholder="12">
+                    <input type="text" th:field="*{detalles[__${iterStat.index}__].descripcion}" placeholder="CEVICHE COMPLETO CAMARON" required>
+                    <input type="number" th:field="*{detalles[__${iterStat.index}__].cantidad}" min="1" value="1" required>
+                    <input type="number" step="0.01" th:field="*{detalles[__${iterStat.index}__].precioUnitario}" placeholder="7.39" required>
+                    <button type="button" class="btn-remove" onclick="removeDetalle(this)">✕</button>
+                </div>
+            </div>
+            <button type="button" class="btn-add" onclick="agregarDetalle()">+ Agregar Producto</button>
+        </div>
+
+
+        <!-- SECCIÓN 3: FORMA DE PAGO -->
+        <div class="section">
+            <h2>Forma de Pago</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Forma de Pago</label>
+                    <select th:field="*{formaPago}" required>
+                        <option value="efectivo">Efectivo</option>
+                        <option value="tarjeta debito">Tarjeta Débito</option>
+                        <option value="tarjeta credito">Tarjeta Crédito</option>
+                        <option value="transferencia">Transferencia</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTÓN GENERAR FACTURA -->
+        <button type="submit" class="btn-submit">🧾 GENERAR FACTURA</button>
+    </form>
+</div>
+
+<script>
+    let detalleIndex = /*[[${factura.detalles.size()}]]*/ 1;
+
+    function agregarDetalle() {
+        const container = document.getElementById('detalles-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'detalle-row';
+        newRow.innerHTML = `
+                <input type="text" name="detalles[${detalleIndex}].codigo" placeholder="12">
+                <input type="text" name="detalles[${detalleIndex}].descripcion" placeholder="Descripción del producto" required>
+                <input type="number" name="detalles[${detalleIndex}].cantidad" min="1" value="1" required>
+                <input type="number" step="0.01" name="detalles[${detalleIndex}].precioUnitario" placeholder="0.00" required>
+                <input type="number" step="0.01" name="detalles[${detalleIndex}].descuento" value="0" placeholder="0.00">
+                <button type="button" class="btn-remove" onclick="removeDetalle(this)">✕</button>
+            `;
+        container.appendChild(newRow);
+        detalleIndex++;
+    }
+
+    function removeDetalle(button) {
+        const container = document.getElementById('detalles-container');
+        // No permitir eliminar si solo hay una línea
+        if (container.children.length > 1) {
+            button.parentElement.remove();
+        } else {
+            alert('Debe haber al menos un producto en la factura');
+        }
+    }
+</script>
+</body>
+</html>

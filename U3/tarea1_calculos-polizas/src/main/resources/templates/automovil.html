@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Datos del Automóvil</title>
+</head>
+<body>
+    <!-- Fragmento de formulario de automóvil -->
+    <div th:fragment="form-automovil" class="form-section" id="seccion-automovil">
+        <div class="section-header">
+            <span class="section-icon"></span>
+            <h2>Datos del Automóvil</h2>
+        </div>
+        
+        <div class="form-group">
+            <label for="modelo">
+                <span class="label-icon">🏷</span>
+                Modelo del Vehículo
+            </label>
+            <select id="modelo" name="modelo" required>
+                <option value="" disabled selected>Seleccione un modelo</option>
+                <option value="A">Modelo A - Estándar (1.1% adicional)</option>
+                <option value="B">Modelo B - Intermedio (1.2% adicional)</option>
+                <option value="C">Modelo C - Premium (1.5% adicional + $300)</option>
+            </select>
+            <span class="field-hint">El modelo afecta el costo de la póliza</span>
+        </div>
+        
+        <div class="form-group">
+            <label for="valorAuto">
+                <span class="label-icon"></span>
+                Valor del Automóvil ($)
+            </label>
+            <input type="number" id="valorAuto" name="valorAuto" min="1000" step="100" placeholder="Ej: 25000" required>
+            <span class="field-hint">Valor comercial del vehículo en dólares</span>
+        </div>
+        
+        <div class="info-box">
+            <h4>💡 Información sobre cargos:</h4>
+            <ul>
+                <li><strong>Cargo base:</strong> 3.5% del valor del auto</li>
+                <li><strong>Modelo A:</strong> +1.1% del valor</li>
+                <li><strong>Modelo B:</strong> +1.2% del valor</li>
+                <li><strong>Modelo C:</strong> +1.5% del valor + $300</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
